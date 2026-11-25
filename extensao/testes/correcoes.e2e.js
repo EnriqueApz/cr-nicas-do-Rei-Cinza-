@@ -181,6 +181,38 @@ const texto = (page, sel) => page.textContent(`#assistente-rc ${sel}`);
     await p.close();
   });
 
+  await caso('ligar o ataque à ficha: o botão manda o comando da ficha', async () => {
+    const p = await abrir(context, 'roll20-falso.html');
+    const comando = '%{-P4l-PgK3XoGtj47Cqnm|repeating_npcaction("zDjG5RCxH", "action")}';
+    p.once('dialog', (d) => d.accept(comando));
+    await comecar(p);
+    await p.click('#assistente-rc .arc-jogada [data-a="vincular"][data-chave="tobias:acao:maca"]');
+    assert.match(await texto(p, '.arc-cartao'), /Ataque ✓ ficha/);
+    await p.click('#assistente-rc .arc-jogada button[data-kind="ataque"][data-acao="maca"]');
+    await p.waitForTimeout(1000);
+    const m = await p.$$eval('#mensagens li', (lis) => lis.map((l) => l.textContent));
+    assert.equal(m.at(-1), comando);
+    // o dano sai pelos botões do quadro da ficha: o painel esconde os dele para essa ação
+    assert.equal(await p.$$eval('#assistente-rc .arc-jogada button[data-kind="dano"][data-acao="maca"]', (els) => els.length), 0);
+    // a ligação continua depois de recomeçar a luta
+    p.once('dialog', (d) => d.accept());
+    await p.click('#assistente-rc [data-a="recomecar"]');
+    await comecar(p);
+    await p.click('#assistente-rc .arc-jogada button[data-kind="ataque"][data-acao="maca"]');
+    await p.waitForTimeout(1000);
+    assert.equal((await p.$$eval('#mensagens li', (lis) => lis.map((l) => l.textContent))).at(-1), comando);
+    await p.close();
+  });
+
+  await caso('ligação com texto errado é recusada', async () => {
+    const p = await abrir(context, 'roll20-falso.html');
+    p.once('dialog', (d) => d.accept('qualquer coisa'));
+    await comecar(p);
+    await p.click('#assistente-rc .arc-jogada [data-a="vincular"][data-chave="tobias:acao:maca"]');
+    assert.match(await texto(p, '.arc-info'), /não parece um comando da ficha/);
+    await p.close();
+  });
+
   await browser.close();
   console.log(`# pass ${passou}`);
 })().catch((e) => { console.error('not ok -', e.message); process.exit(1); });

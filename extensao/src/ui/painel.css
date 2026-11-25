@@ -61,3 +61,5 @@
 #assistente-rc .arc-conc { color: #9fd3a7; }
 #assistente-rc .arc-vazio { display: inline-block; width: 28px; }
 #assistente-rc .arc-adicionar { margin: 6px 0 2px; }
+#assistente-rc button.arc-ligado { background: #2f5d6b; border-color: #3f8197; }
+#assistente-rc button.arc-elo { padding: 3px 5px; margin-right: 6px; opacity: .8; }

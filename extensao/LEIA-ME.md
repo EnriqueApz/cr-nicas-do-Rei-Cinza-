@@ -35,6 +35,20 @@ Se a rolagem **não** aparecer no chat, me avise. Até lá, o painel mostra uma 
 - **"Só para mim" ou "Para todos"**, no topo, decide quem vê as rolagens. O padrão é só você.
 - **Se a página do Roll20 recarregar,** a luta continua de onde parou.
 
+## Ligar os botões às fichas do Roll20 (o quadro igual ao da ficha)
+
+Cada ataque e magia do painel tem um botão **🔗** ao lado. Ligando, o botão passa a mandar o comando da ficha, e o chat mostra o **quadro da própria ficha**, com os botões "Damage" e "Crit Damage" e a estrela do crítico.
+
+Para ligar uma ação (uma vez só por ação; fica guardado):
+1. Na ficha do monstro no Roll20, clique na ação (por exemplo, Maça Sacrílega).
+2. Clique no campo do chat, vazio, e aperte a **seta para cima ↑**. Aparece um texto como `%{-P4l-...|repeating_npcaction("...", "action")}`.
+3. Copie esse texto (Ctrl+A, Ctrl+C).
+4. No painel, clique no **🔗** ao lado do botão dessa ação e cole (Ctrl+V).
+
+O botão fica azul com "✓ ficha". O dano dessa ação passa a sair pelos botões do quadro da ficha no chat. Para desligar, clique no 🔗 e apague o texto.
+
+Cultistas, raízes e lobos: se todos os tokens de um tipo usam a mesma ficha, basta ligar uma vez.
+
 ## Cuidados
 
 - **Compartilhando a tela** (Discord, por exemplo)? Minimize o painel com o botão **_**. Para reabrir, clique na bolinha ⚔.

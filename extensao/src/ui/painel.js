@@ -8,6 +8,7 @@
   const D = A.dados.m01c06;
 
   let estado = null;
+  let vinculos = {};
   let raizEl = null;
   let bolhaEl = null;
   const ui = { erroChat: null, ultimoComando: '', mensagem: '' };
@@ -41,11 +42,24 @@
   }
 
   // ---------- pedaços do HTML ----------
+  // Ligação de um botão à ação da ficha do Roll20: "tobias:acao:maca", "tobias:magia:chamaSagrada".
+  const LIGAVEIS = ['ataque', 'magia', 'armaAtaque'];
+  const DANOS = ['dano', 'danoCritico', 'danoMagia', 'danoMagiaCritico'];
+  function chaveVinculo(fichaId, b) {
+    return b.acaoId ? `${fichaId}:acao:${b.acaoId}` : `${fichaId}:magia:${b.magiaId}`;
+  }
+
   function htmlBotao(b, id) {
+    const c = estado.combatentes[id];
+    const chave = c ? chaveVinculo(c.fichaId, b) : '';
+    const ligado = !!vinculos[chave];
+    if (ligado && DANOS.includes(b.kind)) return '';
     const attrs = [`data-rolar`, `data-kind="${b.kind}"`, `data-id="${esc(id)}"`];
     if (b.acaoId) attrs.push(`data-acao="${b.acaoId}"`);
     if (b.magiaId) attrs.push(`data-magia="${b.magiaId}"`);
-    return `<button ${attrs.join(' ')}>${esc(b.rotulo)}</button>`;
+    if (!LIGAVEIS.includes(b.kind) || !c) return `<button ${attrs.join(' ')}>${esc(b.rotulo)}</button>`;
+    return `<button ${attrs.join(' ')}${ligado ? ' class="arc-ligado"' : ''}>${esc(b.rotulo)}${ligado ? ' ✓ ficha' : ''}</button>`
+      + `<button data-a="vincular" data-chave="${chave}" class="arc-elo" title="${ligado ? 'Ligado à ficha do Roll20. Clique para trocar ou desligar.' : 'Ligar à ação da ficha do Roll20'}">🔗</button>`;
   }
 
   function htmlPv(c) {
@@ -240,6 +254,28 @@
     }
     const c = e.combatentes[el.dataset.id];
     const f = ficha(c);
+    const comandoFicha = LIGAVEIS.includes(kind)
+      ? vinculos[chaveVinculo(c.fichaId, { acaoId: el.dataset.acao, magiaId: el.dataset.magia })]
+      : null;
+    if (comandoFicha) {
+      if (kind === 'magia') {
+        const m = f.magias[el.dataset.magia];
+        if (m.circulo > 0) {
+          if (!(c.espacos[m.circulo] > 0)) {
+            ui.mensagem = `Sem espaço de ${CIRCULOS[m.circulo]} círculo para ${m.nome}.`;
+            return render();
+          }
+          e = E.gastarEspaco(e, c.id, m.circulo);
+        }
+        if (m.concentracao) e = E.definirConcentracao(e, c.id, el.dataset.magia);
+      }
+      if (c.desvantagemProximoAtaque && kind !== 'magia') {
+        ui.mensagem = 'Tobias está abalado: este ataque é com desvantagem. Role de novo e fique com o menor.';
+        e = E.consumirDesvantagem(e, c.id);
+      }
+      enviarMsg(comandoFicha);
+      return mudar(e);
+    }
     if (kind === 'ataque' || kind === 'armaAtaque') {
       const acao = kind === 'ataque' ? f.acoes[el.dataset.acao] : { nome: 'Arma Espiritual', bonus: f.magias.armaEspiritual.ataque };
       enviarMsg(C.montarAtaque(c.nome, acao, { ...o, desvantagem: c.desvantagemProximoAtaque }));
@@ -306,6 +342,27 @@
         return undefined;
       case 'fechar-info': ui.mensagem = ''; return render();
       case 'fechar-erro': ui.erroChat = null; return render();
+      case 'vincular': {
+        const chave = el.dataset.chave;
+        const atual = vinculos[chave] || '';
+        const resposta = globalThis.prompt(
+          'Ligar à ficha do Roll20:\n1) Na ficha do monstro, clique nesta ação.\n2) Clique no campo do chat (vazio) e aperte a seta para cima ↑.\n3) Copie o texto (Ctrl+A, Ctrl+C) e cole aqui.\nDeixe vazio para desligar.',
+          atual);
+        if (resposta === null) return undefined;
+        const comando = resposta.trim();
+        if (comando === '') {
+          delete vinculos[chave];
+          ui.mensagem = 'Ligação desfeita: este botão volta a rolar pelo painel.';
+        } else if (!/^%\{[^|}]+\|.+\}$/.test(comando)) {
+          ui.mensagem = 'Esse texto não parece um comando da ficha. Ele começa com %{ e termina com }.';
+          return render();
+        } else {
+          vinculos[chave] = comando;
+          ui.mensagem = 'Ligado à ficha. O dano agora sai pelos botões do quadro da ficha no chat.';
+        }
+        S.salvarVinculos(vinculos);
+        return render();
+      }
       case 'diagnostico': {
         const texto = C.diagnostico(document);
         ui.mensagem = C.copiar(texto, document)
@@ -426,6 +483,7 @@
       ? salvo
       : novoCombate({ jogadores: 5, chegada: 'preparado', ritualCompleto: false });
     estado.painel = estado.painel || { aguardandoCuraFe: false };
+    vinculos = (await S.carregarVinculos()) || {};
     const pos = await S.carregarPosicao();
     if (pos && pos.left && pos.top) {
       raizEl.style.left = pos.left;

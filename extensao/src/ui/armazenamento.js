@@ -44,6 +44,27 @@
     });
   }
 
+  // Ligações dos botões às ações das fichas do Roll20. Ficam separadas da luta: "Recomeçar" não apaga.
+  const CHAVE_VINC = 'assistente-vinculos';
+
+  function salvarVinculos(v) {
+    try {
+      if (temChrome()) chrome.storage.local.set({ [CHAVE_VINC]: v });
+      else localStorage.setItem(CHAVE_VINC, JSON.stringify(v));
+    } catch (_) { /* ligações só nesta visita */ }
+  }
+
+  function carregarVinculos() {
+    return new Promise((resolve) => {
+      try {
+        if (temChrome()) chrome.storage.local.get(CHAVE_VINC, (r) => resolve((r && r[CHAVE_VINC]) || null));
+        else resolve(JSON.parse(localStorage.getItem(CHAVE_VINC) || 'null'));
+      } catch (_) { resolve(null); }
+    });
+  }
+
   globalThis.AssistenteRC = globalThis.AssistenteRC || {};
-  globalThis.AssistenteRC.armazenamento = { salvar, carregar, limpar, salvarPosicao, carregarPosicao };
+  globalThis.AssistenteRC.armazenamento = {
+    salvar, carregar, limpar, salvarPosicao, carregarPosicao, salvarVinculos, carregarVinculos,
+  };
 })();
