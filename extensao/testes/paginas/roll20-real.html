@@ -1,0 +1,24 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Roll20 real: envia pela página e não limpa o campo</title></head>
+<body style="background:#ddd">
+<div id="textchat-input"><textarea class="ui-autocomplete-input"></textarea><div><button id="chatSendBtn" class="btn">Send</button></div></div>
+<ul id="mensagens"></ul>
+<script>
+  // Imita o Roll20 real: ignora cliques e teclas sintéticos; só o jQuery da página consegue enviar.
+  const area = document.querySelector('#textchat-input textarea');
+  const botao = document.getElementById('chatSendBtn');
+  function enviarDeVerdade() {
+    if (!area.value.trim()) return;
+    const li = document.createElement('li'); li.textContent = area.value;
+    document.getElementById('mensagens').appendChild(li);
+  }
+  let pelaPagina = false;
+  botao.addEventListener('click', (e) => { if (e.isTrusted || pelaPagina) enviarDeVerdade(); });
+  area.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.isTrusted) enviarDeVerdade(); });
+  window.jQuery = function (sel) {
+    const els = typeof sel === 'string' ? [...document.querySelectorAll(sel)] : [sel];
+    return {
+      val(v) { if (v === undefined) return els[0] && els[0].value; els.forEach((e) => { e.value = v; }); return this; },
+      trigger(ev) { if (ev === 'click') { pelaPagina = true; els.forEach((e) => e.click()); pelaPagina = false; } return this; },
+    };
+  };
+</script></body></html>

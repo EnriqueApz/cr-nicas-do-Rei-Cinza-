@@ -27,6 +27,8 @@ const assert = require('node:assert/strict');
   await page.waitForTimeout(1500);
   const msgs = await page.$$eval('#mensagens li', (lis) => lis.map((l) => l.textContent));
   assert.ok(msgs.at(-1).startsWith('/w gm &{template:default} {{name=Tobias — Maça Sacrílega}}'));
+  assert.equal(await page.$$eval('#assistente-rc .arc-erro-chat', (els) => els.length), 0, 'faixa vermelha apareceu');
+  assert.equal(msgs.length, 1, 'rolagem repetida no chat');
   await context.close();
   console.log(`ok - extensão carregada no Chromium (${arquivo}): painel aparece e a rolagem chega ao chat`);
 })().catch((e) => { console.error('not ok -', e.message); process.exit(1); });

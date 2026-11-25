@@ -15,7 +15,10 @@ async function injetar(page) {
   await page.waitForSelector('#assistente-rc');
 }
 
-const mensagens = (page) => page.$$eval('#mensagens li', (lis) => lis.map((l) => l.textContent));
+const mensagens = async (page) => {
+  await page.waitForTimeout(1000); // o envio tenta a ponte da página antes do clique
+  return page.$$eval('#mensagens li', (lis) => lis.map((l) => l.textContent));
+};
 
 async function preencherIniciativas(page) {
   const campos = await page.$$('#assistente-rc input[data-ini]');

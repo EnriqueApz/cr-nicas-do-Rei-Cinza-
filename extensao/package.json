@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "test": "node --test testes/*.test.js",
-    "e2e": "node testes/painel.e2e.js && node testes/correcoes.e2e.js && node testes/extensao-real.e2e.js && node testes/extensao-real.e2e.js roll20-so-pagina.html",
+    "e2e": "node testes/painel.e2e.js && node testes/correcoes.e2e.js && node testes/extensao-real.e2e.js && node testes/extensao-real.e2e.js roll20-so-pagina.html && node testes/extensao-real.e2e.js roll20-real.html",
     "tudo": "npm test && npm run e2e"
   }
 }

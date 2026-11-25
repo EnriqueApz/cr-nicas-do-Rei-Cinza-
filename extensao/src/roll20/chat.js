@@ -117,20 +117,17 @@
       campo.dispatchEvent(new KeyboardEvent('keydown', tecla));
       campo.dispatchEvent(new KeyboardEvent('keyup', tecla));
     };
-    const ponte = () => {
-      const janela = doc.defaultView || globalThis;
-      janela.postMessage({ origem: 'assistente-rc', tipo: 'enviar', texto }, '*');
+    const devolverRascunho = () => {
+      escrever(rascunho || '');
+      campo.dispatchEvent(new Event('input', { bubbles: true }));
     };
-    // Três tentativas, uma de cada vez. Só passa para a seguinte se o Roll20 não esvaziou o campo.
-    const tentativas = botao ? [() => botao.click(), enter, ponte] : [enter, ponte];
+    // Plano B (sem a ponte): clique e depois Enter. Só passa para o seguinte se o Roll20 não esvaziou o campo.
+    const tentativas = botao ? [() => botao.click(), enter] : [enter];
     const enviado = () => ler().trim() !== texto.trim();
     let i = 0;
     const proxima = () => {
       if (enviado()) {
-        if (rascunho && ler().trim() === '') {
-          escrever(rascunho);
-          campo.dispatchEvent(new Event('input', { bubbles: true }));
-        }
+        if (rascunho && ler().trim() === '') devolverRascunho();
         return;
       }
       if (i >= tentativas.length) {
@@ -140,9 +137,26 @@
       tentativas[i++]();
       setTimeout(proxima, espera);
     };
-    tentativas[i++]();
-    setTimeout(proxima, espera);
-    return { ok: true, via: botao ? 'botao' : 'enter' };
+    // Primeiro a ponte, que roda dentro da página e usa o jQuery do Roll20 (o Roll20 real ignora
+    // cliques da extensão e não limpa o campo depois). Ela responde dizendo se conseguiu enviar.
+    const janela = doc.defaultView || globalThis;
+    let respondeu = false;
+    const ouvir = (ev) => {
+      const d = ev.data;
+      if (ev.source !== janela || !d || d.origem !== 'assistente-rc-ponte' || d.tipo !== 'resultado') return;
+      janela.removeEventListener('message', ouvir);
+      respondeu = true;
+      if (d.via === 'jquery-clique' || d.via === 'd20') devolverRascunho();
+      else proxima();
+    };
+    janela.addEventListener('message', ouvir);
+    janela.postMessage({ origem: 'assistente-rc', tipo: 'enviar', texto }, '*');
+    setTimeout(() => {
+      if (respondeu) return;
+      janela.removeEventListener('message', ouvir);
+      proxima();
+    }, espera);
+    return { ok: true, via: 'ponte' };
   }
 
   const api = { montarAtaque, montarDano, montarMagia, montarDanoMagia, montarCura, montarCovil, enviar, dobrarDados, diagnostico, copiar };

@@ -168,6 +168,19 @@ const texto = (page, sel) => page.textContent(`#assistente-rc ${sel}`);
     await p.close();
   });
 
+  await caso('Roll20 real: envia pela página, não limpa o campo, e não aparece faixa vermelha', async () => {
+    const p = await abrir(context, 'roll20-real.html');
+    await comecar(p);
+    await p.fill('#textchat-input textarea', 'rascunho');
+    await p.click('#assistente-rc .arc-cartao button[data-kind="ataque"][data-acao="maca"]');
+    await p.waitForTimeout(1500);
+    const m = await p.$$eval('#mensagens li', (lis) => lis.map((l) => l.textContent));
+    assert.equal(m.length, 1);
+    assert.equal(!!(await p.$('#assistente-rc .arc-erro-chat')), false);
+    assert.equal(await p.inputValue('#textchat-input textarea'), 'rascunho');
+    await p.close();
+  });
+
   await browser.close();
   console.log(`# pass ${passou}`);
 })().catch((e) => { console.error('not ok -', e.message); process.exit(1); });
