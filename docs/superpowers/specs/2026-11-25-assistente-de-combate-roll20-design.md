@@ -35,6 +35,7 @@ O primeiro uso real é a luta contra **Tobias Greim** (Missão 1, Cena 6) no sá
 - **Atrasar o mestre no combate.** Cada turno precisa caber em poucos cliques.
 - **Falhar sem avisar no sábado.** Se o envio para o chat não funcionar, o mestre precisa ver isso e ter um plano B na hora.
 - **Mostrar rolagem secreta para os jogadores sem querer.**
+- **Os jogadores perceberem que existe uma extensão.** Eles usam o Beyond20 para rolar e não devem saber do assistente. As mensagens no chat não levam nome, marca nem assinatura da extensão: parecem uma rolagem comum do mestre. Nada é instalado nem mostrado do lado dos jogadores.
 
 ## Restrições
 
