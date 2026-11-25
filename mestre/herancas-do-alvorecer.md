@@ -31,14 +31,84 @@ Ossian diz isso na Missão 7, quando é desmascarado:
 
 ---
 
-## Como usar na sessão zero
+## Descoberta gradual: cada um abraça a herança aos poucos
 
-1. Cada jogador escolhe uma herança, ou nenhuma. Nem todo mundo precisa ter uma. Duas heranças iguais também funcionam: os personagens seriam primos distantes.
-2. Entregue a cada um só o cartão da herança dele, do arquivo dos jogadores.
-3. Faça duas perguntas para cada jogador e anote as respostas:
-   - "Quem na sua família ainda acredita na Ordem, e quem acha que é bobagem?"
-   - "O que você fez com o objeto até hoje: guardou, vendeu, usou, escondeu?"
-4. Os jogadores **sabem** que descendem da Ordem. **Não sabem** o que a Ordem fez de verdade. As lendas de família estão incompletas, e algumas estão erradas de propósito. A verdade aparece nos murais da Missão 5.
+A campanha já começou, então ninguém recebe a herança pronta. Cada personagem passa por quatro etapas, cada um no seu ritmo:
+
+| Etapa | O que acontece | O que você faz |
+|---|---|---|
+| 1. Sinal | Um detalhe estranho, sem explicação | Descreva e não explique. Se perguntarem, "você não sabe". |
+| 2. Pista | O detalhe se liga à Ordem do Alvorecer | Deixe o jogador ligar os pontos sozinho. |
+| 3. Revelação | Um NPC ou um lugar confirma o que ele é | É a cena de destaque daquele personagem. |
+| 4. Escolha | O personagem decide se aceita a herança | Pergunte ao jogador, dentro da cena: "Você aceita?" |
+
+**A escolha é de verdade.** Quem aceita ganha o Dom e o verso do juramento. Quem recusa continua normal, e a herança pode passar a um NPC: Nilo pode virar o herdeiro da Pena, ou Edda adota a Espada. A recusa também é uma boa história.
+
+**O objeto já está na ficha.** Sempre que der, a herança se apoia em algo que o personagem já tem: o símbolo sagrado, uma runa, o grimório, o familiar. Assim não é preciso mudar o passado de ninguém, só reinterpretar o que já existe.
+
+**Espalhe os destaques.** Cada personagem tem a sua revelação numa missão diferente, para ninguém ficar sem cena e ninguém roubar a cena do outro. A Missão 5 (Vigília de Ferro) é o ponto de encontro: lá, quem já aceitou faz o juramento diante de Edda.
+
+### O mapa da mesa atual
+
+| Personagem | Herança | Sinal | Pista | Revelação | Escolha |
+|---|---|---|---|---|---|
+| Clérigo da Guerra | A Chama | 1 | 2 | 5 | 5 |
+| Mago gnomo conjurador | A Pena | 1 | 4 | 4 | 5 ou 6 |
+| Autognomo guerreiro rúnico | A Forja | 1 | 3 | 8 | 10 |
+| Véspero (bruxo, Undead Patron) | O Outro Lado | 1 | 5 | 7 | 11 |
+| Quinto personagem | A definir (ver o fim desta seção) | — | — | — | — |
+
+Os números são as missões. A ordem foi pensada para começar pelo clérigo, que é o mais fácil, e terminar pelo Véspero, que é o mais pesado.
+
+### Clérigo da Guerra: A Chama
+
+A herança dele não precisa ser de sangue. Pode vir de **quem o ensinou**: o templo ou o mentor dele foi fundado, gerações atrás, por um capelão do Alvorecer.
+
+- **Sinal (Missão 1, sessão 3):** na capela de Vaudreux, atrás do reboco rachado, aparece um sol entalhado na pedra. Quando o clérigo reza ali, a oração dele sai com palavras que ele nunca aprendeu, e as palavras param no meio.
+- **Pista (Missão 2):** depois da Missão 1, o grupo pode achar entre as coisas de Tobias um livro de orações antigo, de capa queimada, que estava na capela muito antes dele. A "Oração do Silêncio" tem os mesmos versos que o clérigo sabe de cor. Comparar com o registro de Coline mostra a palavra trocada: "calar" virou "guardar".
+- **Revelação (Missão 5):** Edda ouve o clérigo rezar e para: "Você reza como um capelão do Alvorecer. Quem te ensinou isso?"
+- **Escolha (Missão 5):** fazer o juramento no Salão. O verso dele: *"Eu calo o que não deve falar."*
+
+### Mago gnomo conjurador: A Pena
+
+- **Sinal (Missão 1):** no grimório dele há uma página escrita numa cifra que ele nunca conseguiu ler. Pode ser herança do mestre que o ensinou, ou algo que ele comprou sem saber o que era. Quando ele conjura objetos, às vezes aparece neles um sol pequeno gravado.
+- **Pista e revelação (Missão 4):** no Arquivo Real, o Escriba Cinzento ataca o mago antes dos outros, porque a página dele resiste ao apagamento. No Cofre das Tintas, o códice de onde a página foi arrancada tem um buraco do tamanho exato dela, e Ossian se oferece para ajudar a decifrar.
+- **Escolha (Missão 5 ou 6):** continuar decifrando o códice sabendo do que se trata, e fazer o juramento. O verso dele: *"Eu lembro para que ninguém repita."*
+- O mago é quem Ossian mais tenta conquistar. Quanto mais amigos eles ficarem, mais dói na Missão 7.
+
+### Autognomo guerreiro rúnico: A Forja
+
+Para um autognomo, a pergunta da herança vira outra: **"Eu fui feito para isso?"** O tema dele é propósito contra liberdade.
+
+- **Sinal (Missão 1):** entre as runas dele há uma que ele nunca aprendeu, um sol. Ela fica morna quando ele olha para o norte.
+- **Pista (Missão 3):** em Grisval, os canteiros reconhecem a marca da runa: "Isso é marca de forja antiga, do norte. Ninguém mais faz assim."
+- **Pista (Missão 5):** a porta de bronze na cripta da Vigília tem um encaixe no formato da runa. Ela encaixa, mas a porta não abre. Ele ouve, do outro lado, uma batida, como um coração.
+- **Revelação (Missão 8):** no laboratório da Lanterna, Ossian usa a mesma técnica, roubada. Quem construiu o autognomo aprendeu com uma família de ferreiros do Alvorecer.
+- **Escolha (Missão 10):** Ilsabet olha para ele: "Você foi feito com o fogo desta forja. Mas ninguém te obriga a nada. Fica, se quiser." O verso dele: *"Eu dou de mim para que a lâmina viva."*
+- O segredo de que a família dos ferreiros também fez a Coroa vira: **quem fez a Coroa ensinou quem fez você.**
+
+### Véspero (bruxo Reborn, Undead Patron): O Outro Lado
+
+Ele não descende da Ordem. A vida anterior dele foi em Vaenmoor. Proposta de patrono: a **ama do príncipe Mael**, morta há 300 anos (combine com o jogador).
+
+- **Sinal (Missões 1 a 4):** a voz de uma mulher velha nos sonhos, que diz "Ainda não. Mais ao norte." E o familiar dele: um cachorrinho espectral com olhos de brasa.
+- **Pista (Missão 5):** o painel escondido do mural mostra um menino num quarto cheio de soldadinhos, com um cachorro igual ao familiar.
+- **Revelação (Missão 7):** Ossian diz a palavra de comando "Vaelmorikar", e o Véspero entende a palavra. "Vaelorik" é da mesma língua antiga.
+- **Escolha (Missão 11):** na Terra Cinzenta, a ama aparece em pessoa e pede: "Proteja o menino." O familiar corre até Mael, e Mael diz: "Brasa! Você me achou!" Aceitar é proteger Mael, o que abre caminho para o Final A.
+- Ele não tem verso, porque a família dele nunca jurou nada. Se proteger Mael, no Trono Cinzento a ama ensina a ele a canção de ninar. Ela funciona como o soldadinho de Vorn: o rei perde o primeiro turno. Os dois efeitos não se somam.
+
+### O quinto personagem
+
+Ainda não está definido. Duas opções:
+
+- **A Vigia:** o mapa com os seis esconderijos. Serve para qualquer andarilho. Sinal: o mapa é algo que ele já carrega sem saber o que é.
+- **O lado do vilão:** se for o personagem que matou o pai de Mira, a ligação dele é com Tobias e com o homem de cinza, não com a Ordem. Ele pode abraçar a Ordem depois, como redenção: Edda toma o juramento de quem quer recomeçar.
+
+### Os versos e os Dons chegam com a escolha
+
+- Ninguém começa com Dom nem com verso.
+- Quando um personagem **aceita** a herança, ganha o Dom e o verso na mesma cena.
+- O juramento inteiro na Missão 13 só funciona com os versos de quem aceitou.
 
 ---
 
@@ -61,9 +131,9 @@ O último verso é sobre soltar. É a lição que Ossian nunca aprendeu, porque 
 
 ### Na Missão 5: o juramento renovado
 
-No Salão do Juramento, os versos entalhados na parede foram raspados pelo Herdeiro que fincou o estandarte. Depois da Cena 5, Edda pode tomar o juramento dos personagens. Cada herdeiro recita o próprio verso, e ela completa: "O resto, ninguém lembra mais."
+No Salão do Juramento, os versos entalhados na parede foram raspados pelo Herdeiro que fincou o estandarte. Depois da Cena 5, Edda pode tomar o juramento de quem já aceitou a herança. Cada um recita o próprio verso, e ela completa: "O resto, ninguém lembra mais." Quem ainda não se decidiu pode jurar depois, diante de Edda ou de Ilsabet.
 
-**Juramento do Alvorecer** (1 vez por descanso longo, liberado na Missão 5). Como ação bônus, um herdeiro recita o seu verso em voz alta. Ele e cada aliado a até 9 m que o ouvir ganham PV temporários iguais ao nível do herdeiro.
+**Juramento do Alvorecer** (1 vez por descanso longo, liberado quando o personagem faz o juramento). Como ação bônus, um herdeiro recita o seu verso em voz alta. Ele e cada aliado a até 9 m que o ouvir ganham PV temporários iguais ao nível do herdeiro.
 
 ### Na Missão 13: o juramento inteiro
 
@@ -81,7 +151,9 @@ Só funciona uma vez.
 
 Cada herança tem: o objeto, a lenda que a família conta, o segredo do mestre, o Dom (uma pequena habilidade), os momentos em que ela volta na campanha e um conflito pessoal para o jogador interpretar.
 
-Os Dons são pequenos de propósito. Eles dão identidade ao personagem sem desequilibrar os encontros.
+Os Dons são pequenos de propósito. Eles dão identidade ao personagem sem desequilibrar os encontros. Na descoberta gradual, o Dom só é liberado quando o personagem aceita a herança.
+
+As fichas abaixo foram escritas como se o personagem soubesse da herança desde o começo. Para a mesa atual, use as etapas da seção anterior e trate a "lenda da família" como algo que o personagem descobre aos poucos (por um NPC, uma carta, um sonho), e não como algo que ele já sabia.
 
 ---
 

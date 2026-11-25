@@ -1,5 +1,7 @@
 # Heranças do Alvorecer — cartões para os jogadores
 
+> **Para o mestre:** na descoberta gradual, **não entregue estes cartões no começo.** Entregue o cartão de cada personagem só depois que ele aceitar a herança (a etapa 4, Escolha). Até lá, ele só conhece os sinais e as pistas que apareceram em jogo.
+
 Há trezentos anos, os cavaleiros da Ordem do Alvorecer venceram o Rei Cinza na Batalha do Trono Cinzento. Depois a Ordem foi se apagando. Os cavaleiros morreram, as famílias se espalharam, e o que restou virou história de avô contada perto do fogo.
 
 A sua família é uma dessas. Escolha um cartão, ou nenhum. Leia só o seu.
