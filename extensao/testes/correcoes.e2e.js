@@ -17,7 +17,7 @@ async function abrir(context, nome) {
 }
 async function injetar(page) {
   for (const css of manifest.content_scripts[0].css) await page.addStyleTag({ path: path.join(raiz, css) });
-  for (const js of manifest.content_scripts[0].js) await page.addScriptTag({ path: path.join(raiz, js) });
+  for (const cs of manifest.content_scripts) for (const js of cs.js) await page.addScriptTag({ path: path.join(raiz, js) });
   await page.waitForSelector('#assistente-rc input[data-ini]');
 }
 async function comecar(page) {
@@ -77,7 +77,7 @@ const texto = (page, sel) => page.textContent(`#assistente-rc ${sel}`);
     const p = await abrir(context, 'roll20-nao-limpa.html');
     await comecar(p);
     await p.click('#assistente-rc .arc-cartao button[data-kind="ataque"][data-acao="maca"]');
-    await p.waitForSelector('#assistente-rc .arc-erro-chat', { timeout: 3000 });
+    await p.waitForSelector('#assistente-rc .arc-erro-chat', { timeout: 5000 });
     assert.match(await texto(p, '.arc-erro-chat'), /Não achei o chat do Roll20|não recebeu/);
     await p.close();
   });
@@ -152,7 +152,19 @@ const texto = (page, sel) => page.textContent(`#assistente-rc ${sel}`);
     const p = await abrir(context, 'roll20-nao-limpa.html');
     await comecar(p);
     await p.click('#assistente-rc .arc-cartao button[data-kind="ataque"][data-acao="maca"]');
-    await p.waitForSelector('#assistente-rc .arc-erro-chat [data-a="diagnostico"]', { timeout: 3000 });
+    await p.waitForSelector('#assistente-rc .arc-erro-chat [data-a="diagnostico"]', { timeout: 5000 });
+    await p.close();
+  });
+
+  await caso('Roll20 que ignora cliques sintéticos: envia de dentro da página', async () => {
+    const p = await abrir(context, 'roll20-so-pagina.html');
+    await comecar(p);
+    await p.click('#assistente-rc .arc-cartao button[data-kind="ataque"][data-acao="maca"]');
+    await p.waitForTimeout(1500);
+    const m = await p.$$eval('#mensagens li', (lis) => lis.map((l) => l.textContent));
+    assert.equal(m.length, 1);
+    assert.ok(m[0].startsWith('/w gm &{template:default} {{name=Tobias — Maça Sacrílega}}'));
+    assert.equal(!!(await p.$('#assistente-rc .arc-erro-chat')), false);
     await p.close();
   });
 

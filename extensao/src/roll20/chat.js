@@ -112,24 +112,37 @@
     escrever(texto);
     campo.dispatchEvent(new Event('input', { bubbles: true }));
     const botao = acharBotao(doc, campo);
-    let via = 'botao';
-    if (botao) {
-      botao.click();
-    } else {
-      via = 'enter';
+    const enter = () => {
       const tecla = { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true };
       campo.dispatchEvent(new KeyboardEvent('keydown', tecla));
       campo.dispatchEvent(new KeyboardEvent('keyup', tecla));
-    }
-    setTimeout(() => {
-      if (ler().trim() === texto.trim()) {
-        if (aoFalhar) aoFalhar(copiar(texto, doc) ? 'copiado' : 'falhou');
-      } else if (rascunho && ler().trim() === '') {
-        escrever(rascunho);
-        campo.dispatchEvent(new Event('input', { bubbles: true }));
+    };
+    const ponte = () => {
+      const janela = doc.defaultView || globalThis;
+      janela.postMessage({ origem: 'assistente-rc', tipo: 'enviar', texto }, '*');
+    };
+    // Três tentativas, uma de cada vez. Só passa para a seguinte se o Roll20 não esvaziou o campo.
+    const tentativas = botao ? [() => botao.click(), enter, ponte] : [enter, ponte];
+    const enviado = () => ler().trim() !== texto.trim();
+    let i = 0;
+    const proxima = () => {
+      if (enviado()) {
+        if (rascunho && ler().trim() === '') {
+          escrever(rascunho);
+          campo.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        return;
       }
-    }, espera);
-    return { ok: true, via };
+      if (i >= tentativas.length) {
+        if (aoFalhar) aoFalhar(copiar(texto, doc) ? 'copiado' : 'falhou');
+        return;
+      }
+      tentativas[i++]();
+      setTimeout(proxima, espera);
+    };
+    tentativas[i++]();
+    setTimeout(proxima, espera);
+    return { ok: true, via: botao ? 'botao' : 'enter' };
   }
 
   const api = { montarAtaque, montarDano, montarMagia, montarDanoMagia, montarCura, montarCovil, enviar, dobrarDados, diagnostico, copiar };

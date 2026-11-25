@@ -1,12 +1,17 @@
 {
   "manifest_version": 3,
   "name": "Assistente de Combate (pessoal)",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Ajuda o mestre nos combates dentro do Roll20.",
-  "permissions": ["storage", "clipboardWrite"],
+  "permissions": [
+    "storage",
+    "clipboardWrite"
+  ],
   "content_scripts": [
     {
-      "matches": ["https://app.roll20.net/editor*"],
+      "matches": [
+        "https://app.roll20.net/editor*"
+      ],
       "js": [
         "src/dados/m01c06-tobias.js",
         "src/motor/estado.js",
@@ -16,7 +21,19 @@
         "src/ui/painel.js",
         "src/conteudo.js"
       ],
-      "css": ["src/ui/painel.css"],
+      "css": [
+        "src/ui/painel.css"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://app.roll20.net/editor*"
+      ],
+      "js": [
+        "src/roll20/ponte-pagina.js"
+      ],
+      "world": "MAIN",
       "run_at": "document_idle"
     }
   ]
