@@ -98,10 +98,10 @@ O Véspero é Reborn: não dorme nem sonha. Faz o descanso longo em 4 horas, par
   - **No descanso parado de 4 horas:** no silêncio, ele ouve uma voz de mulher velha, muito baixa: "Ainda não. Mais ao norte."
   - **No rito do Magical Cunning** (o ritual de 1 minuto para recuperar espaço de magia): enquanto ele faz o rito, a mesma voz canta duas notas de uma canção de ninar.
   - **Na Form of Dread:** quando ele se transforma, as cores em volta dele desbotam, como uma pintura velha. É a aparência da Terra Cinzenta (Missão 11).
-  - **O familiar:** um cachorrinho espectral com olhos de brasa, que às vezes para e fica olhando para o norte.
-- **Pista (Missão 5):** o painel escondido do mural mostra um menino num quarto cheio de soldadinhos, com um cachorro igual ao familiar.
+  - **O familiar (opcional):** o Véspero já tem um diabinho como familiar, e ele continua igual. No máximo, às vezes o diabinho fica inquieto e olha para o norte sem saber por quê.
+- **Pista (Missão 5):** o painel escondido do mural mostra um menino num quarto cheio de soldadinhos e, ao lado da cama, uma velha cantando para ele. Quando o Véspero olha para ela, ouve de novo as duas notas da canção de ninar, agora mais altas.
 - **Revelação (Missão 7):** Ossian diz a palavra de comando "Vaelmorikar", e o Véspero entende a palavra. "Vaelorik" é da mesma língua antiga.
-- **Escolha (Missão 11):** na Terra Cinzenta, a ama aparece em pessoa e pede: "Proteja o menino." O familiar corre até Mael, e Mael diz: "Brasa! Você me achou!" Aceitar é proteger Mael, o que abre caminho para o Final A.
+- **Escolha (Missão 11):** na Terra Cinzenta, a ama aparece em pessoa e pede: "Proteja o menino." Se o Véspero cantarolar a canção de ninar, Mael para de fugir e chega perto: "Só a minha ama sabia essa música." Aceitar é proteger Mael, o que abre caminho para o Final A.
 - Ele não tem verso, porque a família dele nunca jurou nada. Se proteger Mael, no Trono Cinzento a ama ensina a ele a canção de ninar. Ela funciona como o soldadinho de Vorn: o rei perde o primeiro turno. Os dois efeitos não se somam.
 
 ### O quinto personagem
