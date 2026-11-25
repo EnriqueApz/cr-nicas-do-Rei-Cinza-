@@ -1,0 +1,10 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Roll20 sem botão</title></head>
+<body><div id="textchat-input"><textarea></textarea></div><ul id="mensagens"></ul>
+<script>
+  const area = document.querySelector('#textchat-input textarea');
+  area.addEventListener('keydown', (ev) => {
+    if (ev.key !== 'Enter') return;
+    const li = document.createElement('li'); li.textContent = area.value;
+    document.getElementById('mensagens').appendChild(li); area.value = '';
+  });
+</script></body></html>
