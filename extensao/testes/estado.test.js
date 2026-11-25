@@ -195,3 +195,24 @@ test('dano com concentração pede teste de Constituição', () => {
   const sem = E.aplicarDano(E.criarCombate(dados, { jogadores: 4, chegada: 'normal', ritualCompleto: false }), 'tobias', 8);
   assert.deepEqual(sem.eventos, []);
 });
+
+test('montar a luta à mão: tirar 2 cultistas e pôr mais 1 lobo', () => {
+  let e = E.criarCombate(dados, { jogadores: 5, chegada: 'preparado', ritualCompleto: false });
+  e = E.removerCombatente(e, 'cultista-3');
+  e = E.removerCombatente(e, 'cultista-4');
+  e = E.adicionarCombatente(e, dados.fichas.lobo);
+  assert.equal(contar(e, 'cultista'), 2);
+  assert.equal(contar(e, 'lobo'), 2);
+  assert.equal(e.combatentes['lobo-2'].nome, 'Lobo 2');
+  assert.equal(e.combatentes['lobo-2'].iniciativa, null);
+  assert.deepEqual(E.removerCombatente(e, 'tobias'), e);
+});
+
+test('número novo não repete um que já existe', () => {
+  let e = E.criarCombate(dados, { jogadores: 4, chegada: 'normal', ritualCompleto: false });
+  e = E.removerCombatente(e, 'cultista-1');
+  e = E.adicionarCombatente(e, dados.fichas.cultista);
+  assert.ok(e.combatentes['cultista-1']); // reaproveita o número livre
+  assert.ok(e.combatentes['cultista-2']);
+  assert.equal(contar(e, 'cultista'), 2);
+});

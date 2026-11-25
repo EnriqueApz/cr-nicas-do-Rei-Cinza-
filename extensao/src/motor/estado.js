@@ -177,16 +177,24 @@
 
   function adicionarCombatente(estado, ficha) {
     const e = copiar(estado);
-    const existentes = Object.values(e.combatentes).filter((c) => c.fichaId === ficha.id).length;
-    const n = existentes + 1;
+    let n = 1;
+    while (e.combatentes[`${ficha.id}-${n}`]) n += 1;
     const id = `${ficha.id}-${n}`;
     e.combatentes[id] = {
       id, fichaId: ficha.id, nome: `${ficha.nome} ${n}`, pv: ficha.pv, pvMax: ficha.pv, pvTemp: 0,
-      caBase: ficha.ca, ca: ficha.ca, iniciativa: 20, espacos: null, concentracao: null, usos: {},
+      caBase: ficha.ca, ca: ficha.ca, iniciativa: e.iniciado ? 20 : null, espacos: null, concentracao: null, usos: {},
       fase: 1, reacao: true, desvantagemProximoAtaque: false, caido: false, pendenteFeFraturada: false,
     };
     const posCovil = e.ordem.indexOf('covil');
     if (e.iniciado) e.ordem.splice(posCovil >= 0 ? posCovil + 1 : e.ordem.length, 0, id);
+    return e;
+  }
+
+  // Tira um inimigo da luta (só na preparação; Tobias não sai).
+  function removerCombatente(estado, id) {
+    if (estado.iniciado || id === 'tobias' || !estado.combatentes[id]) return estado;
+    const e = copiar(estado);
+    delete e.combatentes[id];
     return e;
   }
 
@@ -248,7 +256,7 @@
 
   const api = {
     criarCombate, definirIniciativa, iniciar, proximoTurno, turnoAnterior,
-    aplicarDano, curar, gastarEspaco, adicionarCombatente, definirConcentracao, marcarAbalado,
+    aplicarDano, curar, gastarEspaco, adicionarCombatente, removerCombatente, definirConcentracao, marcarAbalado,
     consumirDesvantagem, responder, alternarSussurro, numeroValido, copiar,
   };
   globalThis.AssistenteRC = globalThis.AssistenteRC || {};

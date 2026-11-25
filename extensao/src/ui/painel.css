@@ -59,3 +59,5 @@
   font-size: 18px; cursor: pointer; box-shadow: 0 4px 12px rgba(0, 0, 0, .4);
 }
 #assistente-rc .arc-conc { color: #9fd3a7; }
+#assistente-rc .arc-vazio { display: inline-block; width: 28px; }
+#assistente-rc .arc-adicionar { margin: 6px 0 2px; }

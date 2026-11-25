@@ -83,13 +83,18 @@
     const linhas = Object.values(estado.combatentes).map((c) => `
       <div class="arc-linha"><span class="arc-nome">${esc(c.nome)}</span>
         <span>PV ${c.pvMax} · CA ${c.ca}</span>
-        <input type="number" data-ini="${c.id}" placeholder="inic." value="${c.iniciativa ?? ''}"></div>`).join('');
+        <input type="number" data-ini="${c.id}" placeholder="inic." value="${c.iniciativa ?? ''}">
+        ${c.id === 'tobias' ? '<span class="arc-vazio"></span>' : `<button data-a="remover" data-id="${c.id}" title="Tirar da luta">✖</button>`}</div>`).join('');
+    const adicionar = ['cultista', 'raiz', 'lobo']
+      .map((f) => `<button data-a="adicionar" data-ficha="${f}">+ ${esc(D.fichas[f].nome)}</button>`).join('');
     return `<div class="arc-prep">
       <label>Jogadores <select data-a="jogadores">${opc(4, '4', estado.jogadores)}${opc(5, '5', estado.jogadores)}</select></label>
       <label>Chegada <select data-a="chegada">${Object.entries(CHEGADAS).map(([v, t]) => opc(v, t, estado.chegada)).join('')}</select></label>
       <label class="arc-check"><input type="checkbox" data-a="ritual"${estado.ritualCompleto ? ' checked' : ''}> Ritual completo (+15 PV temporários)</label>
       <p>Digite a iniciativa de cada um:</p>
       ${linhas}
+      <div class="arc-adicionar">Adicionar: ${adicionar}</div>
+      <div class="arc-motivo">Mude Jogadores e Chegada antes de tirar ou pôr inimigos: trocar essas opções remonta a lista.</div>
       <button class="arc-principal" data-a="comecar">Começar luta</button>
     </div>`;
   }
@@ -301,6 +306,8 @@
       case 'fechar-info': ui.mensagem = ''; return render();
       case 'fechar-erro': ui.erroChat = null; return render();
       case 'comecar': return mudar(E.iniciar(lerIniciativas(estado)));
+      case 'remover': return mudar(E.removerCombatente(lerIniciativas(estado), el.dataset.id));
+      case 'adicionar': return mudar(E.adicionarCombatente(lerIniciativas(estado), D.fichas[el.dataset.ficha]));
       case 'proximo': return mudar(E.proximoTurno(estado));
       case 'anterior': return mudar(E.turnoAnterior(estado));
       case 'recomecar':

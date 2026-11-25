@@ -118,6 +118,22 @@ const texto = (page, sel) => page.textContent(`#assistente-rc ${sel}`);
     await p.close();
   });
 
+  await caso('editar a luta: tirar 2 cultistas e pôr mais 1 lobo', async () => {
+    const p = await abrir(context, 'roll20-falso.html');
+    await p.click('#assistente-rc [data-a="remover"][data-id="cultista-4"]');
+    await p.click('#assistente-rc [data-a="remover"][data-id="cultista-3"]');
+    await p.click('#assistente-rc [data-a="adicionar"][data-ficha="lobo"]');
+    const nomes = await p.$$eval('#assistente-rc .arc-prep .arc-nome', (els) => els.map((e) => e.textContent.trim()));
+    assert.deepEqual(nomes, ['Tobias', 'Cultista 1', 'Cultista 2', 'Raiz 1', 'Raiz 2', 'Raiz 3', 'Raiz 4', 'Lobo 1', 'Lobo 2']);
+    assert.equal(await p.$$eval('#assistente-rc [data-a="remover"][data-id="tobias"]', (els) => els.length), 0);
+    await p.reload();
+    await injetar(p);
+    assert.equal(await p.$$eval('#assistente-rc .arc-prep .arc-nome', (els) => els.length), 9);
+    await comecar(p);
+    assert.ok(await p.$('#assistente-rc [data-pv="lobo-2"]'));
+    await p.close();
+  });
+
   await browser.close();
   console.log(`# pass ${passou}`);
 })().catch((e) => { console.error('not ok -', e.message); process.exit(1); });
