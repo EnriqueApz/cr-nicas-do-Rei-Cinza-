@@ -172,3 +172,26 @@ test('iniciar trava jogadores e variação', () => {
   assert.equal(e.jogadores, 5);
   assert.equal(e.chegada, 'preparado');
 });
+
+test('adicionarCombatente cria a Raiz seguinte logo depois do covil', () => {
+  let e = E.criarCombate(dados, { jogadores: 4, chegada: 'normal', ritualCompleto: false });
+  for (const id of Object.keys(e.combatentes)) e = E.definirIniciativa(e, id, 8);
+  e = E.definirIniciativa(e, 'tobias', 22);
+  e = E.iniciar(e);
+  e = E.adicionarCombatente(e, dados.fichas.raiz);
+  const nova = e.combatentes['raiz-3'];
+  assert.equal(nova.nome, 'Raiz 3');
+  assert.equal(nova.pv, 13);
+  assert.equal(nova.ca, 12);
+  assert.equal(e.ordem[e.ordem.indexOf('covil') + 1], 'raiz-3');
+});
+
+test('dano com concentração pede teste de Constituição', () => {
+  let e = E.criarCombate(dados, { jogadores: 4, chegada: 'preparado', ritualCompleto: false });
+  let r = E.aplicarDano(e, 'tobias', 22);
+  assert.deepEqual(r.eventos, [{ tipo: 'concentracao', id: 'tobias', cd: 11, magiaId: 'escudoDaFe' }]);
+  r = E.aplicarDano(r.estado, 'tobias', 8);
+  assert.deepEqual(r.eventos, [{ tipo: 'concentracao', id: 'tobias', cd: 10, magiaId: 'escudoDaFe' }]);
+  const sem = E.aplicarDano(E.criarCombate(dados, { jogadores: 4, chegada: 'normal', ritualCompleto: false }), 'tobias', 8);
+  assert.deepEqual(sem.eventos, []);
+});

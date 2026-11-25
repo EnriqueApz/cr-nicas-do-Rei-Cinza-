@@ -32,7 +32,10 @@
 
   // ---------- envio ----------
   function enviarMsg(msg) {
-    const r = C.enviar(msg, document);
+    const r = C.enviar(msg, document, (via) => {
+      ui.erroChat = via === 'copiado' ? 'naoRecebeuCopiado' : 'naoRecebeu';
+      render();
+    });
     ui.erroChat = r.ok ? null : r.via;
     ui.ultimoComando = msg;
   }
@@ -62,10 +65,14 @@
   function htmlAvisosGerais() {
     let h = '';
     if (ui.erroChat) {
-      h += `<div class="arc-erro-chat">${ui.erroChat === 'copiado'
-        ? 'Não achei o chat do Roll20. O comando foi copiado: cole no chat (Ctrl+V).'
-        : 'Não achei o chat do Roll20 e não consegui copiar. Copie o comando abaixo e cole no chat.'}
-        ${ui.erroChat === 'falhou' ? `<textarea readonly>${esc(ui.ultimoComando)}</textarea>` : ''}</div>`;
+      const textos = {
+        copiado: 'Não achei o chat do Roll20. O comando foi copiado: cole no chat (Ctrl+V).',
+        falhou: 'Não achei o chat do Roll20 e não consegui copiar. Copie o comando abaixo e cole no chat.',
+        naoRecebeuCopiado: 'O Roll20 não recebeu a rolagem. O comando ficou no campo do chat: clique lá e aperte Enter (ele também foi copiado).',
+        naoRecebeu: 'O Roll20 não recebeu a rolagem. O comando ficou no campo do chat: clique lá e aperte Enter.',
+      };
+      h += `<div class="arc-erro-chat">${textos[ui.erroChat]}
+        <textarea readonly>${esc(ui.ultimoComando)}</textarea> <button data-a="fechar-erro">ok</button></div>`;
     }
     if (ui.mensagem) h += `<div class="arc-info">${esc(ui.mensagem)} <button data-a="fechar-info">ok</button></div>`;
     return h;
@@ -142,6 +149,7 @@
     const c = estado.combatentes[id];
     const s = T.sugerir(estado, id);
     let h = `<div class="arc-cartao"><h3>Turno: ${esc(c.nome)} <small>${htmlPv(c)} PV · CA ${c.ca}</small></h3>`;
+    if (c.espacos) h += `<div class="arc-espacos">Espaços: 1º ${c.espacos[1]} · 2º ${c.espacos[2]} · 3º ${c.espacos[3]}</div>`;
     h += s.avisos.map((a) => `<div class="arc-aviso">${esc(a)}</div>`).join('');
     if (c.fichaId === 'tobias' && c.fase === 1 && estado.rodada > 1) {
       const v = estado.perguntas.grupoFerido;
@@ -176,7 +184,7 @@
     const linhas = estado.ordem.filter((id) => id !== 'covil').map((id) => {
       const c = estado.combatentes[id];
       return `<div class="arc-linha${c.caido ? ' arc-caido' : ''}${id === atual ? ' arc-atual' : ''}">
-        <span class="arc-nome">${esc(c.nome)}</span>
+        <span class="arc-nome">${esc(c.nome)}${c.concentracao ? ` <small class="arc-conc">conc.: ${esc(D.fichas.tobias.magias[c.concentracao].nome)}</small>` : ''}</span>
         <span data-pv="${id}">${htmlPv(c)}</span><span>CA ${c.ca}</span>
         <input type="text" inputmode="numeric" data-dano="${id}" placeholder="dano">
         <button data-a="aplicar-dano" data-id="${id}" title="Dano">−</button>
@@ -199,7 +207,16 @@
 
   function render() {
     if (!raizEl) return;
+    const corpoAntes = raizEl.querySelector('.arc-corpo');
+    const rolagem = corpoAntes ? corpoAntes.scrollTop : 0;
+    const abertos = {};
+    raizEl.querySelectorAll('details[class]').forEach((d) => { abertos[d.className] = d.open; });
     raizEl.innerHTML = htmlTopo() + `<div class="arc-corpo">${htmlAvisosGerais()}${estado.iniciado ? htmlCombate() : htmlPreparacao()}</div>`;
+    raizEl.querySelectorAll('details[class]').forEach((d) => {
+      if (d.className in abertos) d.open = abertos[d.className];
+    });
+    const corpo = raizEl.querySelector('.arc-corpo');
+    if (corpo) corpo.scrollTop = rolagem;
   }
 
   // ---------- ações ----------
@@ -209,6 +226,10 @@
     const o = { sussurro: e.sussurro };
     if (kind === 'covil') {
       enviarMsg(C.montarCovil(D.fichas.tobias.covil[el.dataset.covil], e.combatentes.tobias.fase, o));
+      if (el.dataset.covil === 'broto' && T.sugerirCovil(e).todas.includes('broto')) {
+        e = E.adicionarCombatente(e, D.fichas.raiz);
+        ui.mensagem = 'Uma Raiz nova brotou ao lado da raiz-mãe e entrou na lista (age logo depois do covil).';
+      }
       return mudar(e);
     }
     const c = e.combatentes[el.dataset.id];
@@ -253,7 +274,20 @@
   function aplicarDano(id) {
     const inp = raizEl.querySelector(`input[data-dano="${id}"]`);
     const r = E.aplicarDano(estado, id, inp ? inp.value : '');
-    mudar(r.estado);
+    let e = r.estado;
+    const avisos = [];
+    for (const ev of r.eventos) {
+      if (ev.tipo === 'limiarFeFraturada' && !e.combatentes[ev.id].reacao) {
+        const rr = T.resolverFeFraturada(e, true);
+        e = rr.estado;
+        avisos.push(rr.mensagem);
+      }
+      if (ev.tipo === 'concentracao') {
+        avisos.push(`Teste de concentração: Constituição CD ${ev.cd} (${D.fichas.tobias.magias[ev.magiaId].nome}). Se falhar, clique em "Encerrar" no cartão de Tobias.`);
+      }
+    }
+    if (avisos.length) ui.mensagem = avisos.join(' ');
+    mudar(e);
   }
 
   function acao(nome, el) {
@@ -265,6 +299,7 @@
         bolhaEl.style.display = 'flex';
         return undefined;
       case 'fechar-info': ui.mensagem = ''; return render();
+      case 'fechar-erro': ui.erroChat = null; return render();
       case 'comecar': return mudar(E.iniciar(lerIniciativas(estado)));
       case 'proximo': return mudar(E.proximoTurno(estado));
       case 'anterior': return mudar(E.turnoAnterior(estado));
@@ -351,7 +386,11 @@
       raizEl.style.top = `${Math.max(0, ev.clientY - inicio.y)}px`;
       raizEl.style.right = 'auto';
     });
-    document.addEventListener('mouseup', () => { inicio = null; });
+    document.addEventListener('mouseup', () => {
+      if (!inicio) return;
+      inicio = null;
+      S.salvarPosicao({ left: raizEl.style.left, top: raizEl.style.top });
+    });
   }
 
   async function montar(corpo = document.body) {
@@ -371,6 +410,12 @@
       ? salvo
       : novoCombate({ jogadores: 5, chegada: 'preparado', ritualCompleto: false });
     estado.painel = estado.painel || { aguardandoCuraFe: false };
+    const pos = await S.carregarPosicao();
+    if (pos && pos.left && pos.top) {
+      raizEl.style.left = pos.left;
+      raizEl.style.top = pos.top;
+      raizEl.style.right = 'auto';
+    }
     raizEl.addEventListener('click', aoClicar);
     raizEl.addEventListener('change', aoMudar);
     raizEl.addEventListener('keydown', aoTeclar);

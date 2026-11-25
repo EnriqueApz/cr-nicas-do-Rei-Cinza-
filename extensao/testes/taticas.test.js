@@ -174,3 +174,10 @@ test('fé fraturada recusada a 0 PV: Tobias cai', () => {
   assert.equal(r.estado.combatentes.tobias.caido, true);
   assert.equal(r.caiu, true);
 });
+
+test('broto conta as raízes que brotaram', () => {
+  let e = combate();
+  e = E.adicionarCombatente(e, dados.fichas.raiz);
+  e = E.adicionarCombatente(e, dados.fichas.raiz);
+  assert.ok(!T.sugerirCovil(e).todas.includes('broto'));
+});

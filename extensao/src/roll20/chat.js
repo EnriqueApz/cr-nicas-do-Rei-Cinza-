@@ -75,21 +75,36 @@
     return false;
   }
 
-  function enviar(texto, doc = globalThis.document) {
+  // Depois de enviar, confere se o Roll20 esvaziou o campo. Se o comando continuar lá,
+  // o Roll20 não recebeu: copia o comando e avisa por aoFalhar('copiado' | 'falhou').
+  // Um rascunho que o mestre tinha digitado no chat volta para o campo depois do envio.
+  function enviar(texto, doc = globalThis.document, aoFalhar = null, espera = 400) {
     const campo = SELETORES_CAMPO.map((s) => doc.querySelector(s)).find(Boolean);
     if (!campo) return { ok: false, via: copiar(texto, doc) ? 'copiado' : 'falhou' };
-    if (campo.isContentEditable) campo.textContent = texto;
-    else campo.value = texto;
+    const ler = () => (campo.isContentEditable ? campo.textContent : campo.value);
+    const escrever = (v) => { if (campo.isContentEditable) campo.textContent = v; else campo.value = v; };
+    const rascunho = ler();
+    escrever(texto);
     campo.dispatchEvent(new Event('input', { bubbles: true }));
     const botao = SELETORES_BOTAO.map((s) => doc.querySelector(s)).find(Boolean);
+    let via = 'botao';
     if (botao) {
       botao.click();
-      return { ok: true, via: 'botao' };
+    } else {
+      via = 'enter';
+      const tecla = { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true };
+      campo.dispatchEvent(new KeyboardEvent('keydown', tecla));
+      campo.dispatchEvent(new KeyboardEvent('keyup', tecla));
     }
-    const tecla = { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true };
-    campo.dispatchEvent(new KeyboardEvent('keydown', tecla));
-    campo.dispatchEvent(new KeyboardEvent('keyup', tecla));
-    return { ok: true, via: 'enter' };
+    setTimeout(() => {
+      if (ler().trim() === texto.trim()) {
+        if (aoFalhar) aoFalhar(copiar(texto, doc) ? 'copiado' : 'falhou');
+      } else if (rascunho && ler().trim() === '') {
+        escrever(rascunho);
+        campo.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    }, espera);
+    return { ok: true, via };
   }
 
   const api = { montarAtaque, montarDano, montarMagia, montarDanoMagia, montarCura, montarCovil, enviar, dobrarDados };

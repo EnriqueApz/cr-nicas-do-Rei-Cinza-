@@ -26,6 +26,24 @@
     } catch (_) { /* nada a limpar */ }
   }
 
+  const CHAVE_POS = 'assistente-posicao';
+
+  function salvarPosicao(pos) {
+    try {
+      if (temChrome()) chrome.storage.local.set({ [CHAVE_POS]: pos });
+      else localStorage.setItem(CHAVE_POS, JSON.stringify(pos));
+    } catch (_) { /* posição só nesta visita */ }
+  }
+
+  function carregarPosicao() {
+    return new Promise((resolve) => {
+      try {
+        if (temChrome()) chrome.storage.local.get(CHAVE_POS, (r) => resolve((r && r[CHAVE_POS]) || null));
+        else resolve(JSON.parse(localStorage.getItem(CHAVE_POS) || 'null'));
+      } catch (_) { resolve(null); }
+    });
+  }
+
   globalThis.AssistenteRC = globalThis.AssistenteRC || {};
-  globalThis.AssistenteRC.armazenamento = { salvar, carregar, limpar };
+  globalThis.AssistenteRC.armazenamento = { salvar, carregar, limpar, salvarPosicao, carregarPosicao };
 })();

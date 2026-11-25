@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "test": "node --test testes/*.test.js",
-    "e2e": "node testes/painel.e2e.js && node testes/extensao-real.e2e.js",
+    "e2e": "node testes/painel.e2e.js && node testes/correcoes.e2e.js && node testes/extensao-real.e2e.js",
     "tudo": "npm test && npm run e2e"
   }
 }

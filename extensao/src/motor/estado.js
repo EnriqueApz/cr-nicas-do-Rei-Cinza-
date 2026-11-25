@@ -166,7 +166,28 @@
       c.caido = true;
       eventos.push({ tipo: 'caiu', id });
     }
+    if (c.concentracao && c.caido) {
+      c.concentracao = null;
+      c.ca = caAtual(c);
+    } else if (c.concentracao) {
+      eventos.push({ tipo: 'concentracao', id, cd: Math.min(30, Math.max(10, Math.floor(n / 2))), magiaId: c.concentracao });
+    }
     return { estado: e, eventos };
+  }
+
+  function adicionarCombatente(estado, ficha) {
+    const e = copiar(estado);
+    const existentes = Object.values(e.combatentes).filter((c) => c.fichaId === ficha.id).length;
+    const n = existentes + 1;
+    const id = `${ficha.id}-${n}`;
+    e.combatentes[id] = {
+      id, fichaId: ficha.id, nome: `${ficha.nome} ${n}`, pv: ficha.pv, pvMax: ficha.pv, pvTemp: 0,
+      caBase: ficha.ca, ca: ficha.ca, iniciativa: 20, espacos: null, concentracao: null, usos: {},
+      fase: 1, reacao: true, desvantagemProximoAtaque: false, caido: false, pendenteFeFraturada: false,
+    };
+    const posCovil = e.ordem.indexOf('covil');
+    if (e.iniciado) e.ordem.splice(posCovil >= 0 ? posCovil + 1 : e.ordem.length, 0, id);
+    return e;
   }
 
   function curar(estado, id, valor) {
@@ -227,7 +248,7 @@
 
   const api = {
     criarCombate, definirIniciativa, iniciar, proximoTurno, turnoAnterior,
-    aplicarDano, curar, gastarEspaco, definirConcentracao, marcarAbalado,
+    aplicarDano, curar, gastarEspaco, adicionarCombatente, definirConcentracao, marcarAbalado,
     consumirDesvantagem, responder, alternarSussurro, numeroValido, copiar,
   };
   globalThis.AssistenteRC = globalThis.AssistenteRC || {};
