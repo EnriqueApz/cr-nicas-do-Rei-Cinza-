@@ -115,6 +115,9 @@ Ações de covil seguem a mesma lógica. Exemplos: Broto quando há poucas Raíz
 
 ### Rolagens no chat
 
+- **Ataque e dano são cliques separados.** O mestre rola o ataque, pergunta ao jogador ("23 te acerta?") e só então rola o dano: botão **"Dano"** ou **"Dano crítico"** (o dobro de dados, porque o Roll20 não dobra sozinho). O mestre prefere assim, mesmo sendo um pouco mais lento.
+- Magias com salvaguarda mostram a CD e têm botão de dano. As salvaguardas são dos jogadores, que rolam pelo Beyond20.
+- Quem rola os dados é o próprio Roll20: a extensão só escreve o comando no chat e envia.
 - Cada botão monta uma mensagem com o modelo padrão do Roll20 (`&{template:default}`) e rolagens embutidas (`[[1d20+4]]`), escreve no campo do chat do Roll20 e clica em enviar. Funciona com qualquer ficha de personagem.
 - **Interruptor no topo: "só para mim (/w gm)" ou "para todos".** O padrão é **só para mim**, para não mostrar rolagem secreta sem querer.
 - **Plano B:** se o painel não achar o campo do chat, mostra um aviso vermelho e passa a **copiar o comando para a área de transferência**. O mestre só cola no chat.
