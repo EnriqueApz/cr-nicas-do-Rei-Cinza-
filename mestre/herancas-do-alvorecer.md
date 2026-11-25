@@ -64,8 +64,9 @@ Os números são as missões. A ordem foi pensada para começar pelo clérigo, q
 
 A herança dele não precisa ser de sangue. Pode vir de **quem o ensinou**: o templo ou o mentor dele foi fundado, gerações atrás, por um capelão do Alvorecer.
 
-- **Sinal (Missão 1, sessão 3):** na capela de Vaudreux, atrás do reboco rachado, aparece um sol entalhado na pedra. Quando o clérigo reza ali, a oração dele sai com palavras que ele nunca aprendeu, e as palavras param no meio.
-- **Pista (Missão 2):** depois da Missão 1, o grupo pode achar entre as coisas de Tobias um livro de orações antigo, de capa queimada, que estava na capela muito antes dele. A "Oração do Silêncio" tem os mesmos versos que o clérigo sabe de cor. Comparar com o registro de Coline mostra a palavra trocada: "calar" virou "guardar".
+- **Sinal (Missão 1, na luta contra Tobias):** o mapa da câmara da raiz-mãe já tem, diante da raiz, um pequeno altar com velas, um anel e **um livro aberto**. É um livro de orações antigo, de capa queimada, que Tobias tirou da capela. Na página aberta há um sol desenhado e uma oração que o clérigo **sabe de cor**, só que pela metade: as últimas linhas foram riscadas por Tobias. Basta descrever isso quando o clérigo chegar perto do altar ou quando a luta acabar.
+- **Se a luta for na vila, e não na raiz-mãe:** o livro está na capela, debaixo do altar. A bíblia já tem a cena: no fim da missão, Bertrand vasculha os papéis da capela e acha a carta de Irmã Coline. Ele entrega o livro junto: "Isso estava escondido debaixo do altar. Tobias nunca deixava ninguém tocar."
+- **Pista (Missão 2):** o livro é a "Oração do Silêncio" da Ordem. Comparar com o registro de Coline mostra a palavra trocada: "calar" virou "guardar".
 - **Revelação (Missão 5):** Edda ouve o clérigo rezar e para: "Você reza como um capelão do Alvorecer. Quem te ensinou isso?"
 - **Escolha (Missão 5):** fazer o juramento no Salão. O verso dele: *"Eu calo o que não deve falar."*
 
@@ -91,7 +92,13 @@ Para um autognomo, a pergunta da herança vira outra: **"Eu fui feito para isso?
 
 Ele não descende da Ordem. A vida anterior dele foi em Vaenmoor. Proposta de patrono: a **ama do príncipe Mael**, morta há 300 anos (combine com o jogador).
 
-- **Sinal (Missões 1 a 4):** a voz de uma mulher velha nos sonhos, que diz "Ainda não. Mais ao norte." E o familiar dele: um cachorrinho espectral com olhos de brasa.
+O Véspero é Reborn: não dorme nem sonha. Faz o descanso longo em 4 horas, parado e consciente. Por isso a voz do patrono não vem em sonho; ela vem nos momentos que já estão na ficha dele:
+
+- **Sinal (Missões 1 a 4):**
+  - **No descanso parado de 4 horas:** no silêncio, ele ouve uma voz de mulher velha, muito baixa: "Ainda não. Mais ao norte."
+  - **No rito do Magical Cunning** (o ritual de 1 minuto para recuperar espaço de magia): enquanto ele faz o rito, a mesma voz canta duas notas de uma canção de ninar.
+  - **Na Form of Dread:** quando ele se transforma, as cores em volta dele desbotam, como uma pintura velha. É a aparência da Terra Cinzenta (Missão 11).
+  - **O familiar:** um cachorrinho espectral com olhos de brasa, que às vezes para e fica olhando para o norte.
 - **Pista (Missão 5):** o painel escondido do mural mostra um menino num quarto cheio de soldadinhos, com um cachorro igual ao familiar.
 - **Revelação (Missão 7):** Ossian diz a palavra de comando "Vaelmorikar", e o Véspero entende a palavra. "Vaelorik" é da mesma língua antiga.
 - **Escolha (Missão 11):** na Terra Cinzenta, a ama aparece em pessoa e pede: "Proteja o menino." O familiar corre até Mael, e Mael diz: "Brasa! Você me achou!" Aceitar é proteger Mael, o que abre caminho para o Final A.
@@ -153,7 +160,7 @@ Cada herança tem: o objeto, a lenda que a família conta, o segredo do mestre, 
 
 Os Dons são pequenos de propósito. Eles dão identidade ao personagem sem desequilibrar os encontros. Na descoberta gradual, o Dom só é liberado quando o personagem aceita a herança.
 
-As fichas abaixo foram escritas como se o personagem soubesse da herança desde o começo. Para a mesa atual, use as etapas da seção anterior e trate a "lenda da família" como algo que o personagem descobre aos poucos (por um NPC, uma carta, um sonho), e não como algo que ele já sabia.
+As fichas abaixo foram escritas como se o personagem soubesse da herança desde o começo. Para a mesa atual, use as etapas da seção anterior e trate a "lenda da família" como algo que o personagem descobre aos poucos (por um NPC, uma carta, uma visão), e não como algo que ele já sabia.
 
 ---
 
