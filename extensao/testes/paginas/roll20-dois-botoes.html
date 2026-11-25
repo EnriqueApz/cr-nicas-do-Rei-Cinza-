@@ -1,0 +1,15 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Roll20 com dois botões</title></head>
+<body style="background:#ddd">
+<div id="textchat-input">
+  <textarea></textarea>
+  <button class="btn">Send</button>
+  <form onsubmit="return false"><button type="submit" class="outro">Outro</button></form>
+</div>
+<ul id="mensagens"></ul>
+<script>
+  const area = document.querySelector('#textchat-input textarea');
+  document.querySelector('#textchat-input .btn').addEventListener('click', () => {
+    const li = document.createElement('li'); li.textContent = area.value;
+    document.getElementById('mensagens').appendChild(li); area.value = '';
+  });
+</script></body></html>

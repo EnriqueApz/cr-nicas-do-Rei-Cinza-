@@ -55,7 +55,32 @@
   }
 
   const SELETORES_CAMPO = ['#textchat-input textarea', 'textarea[name="chatInput"]', '#textchat-input [contenteditable="true"]'];
-  const SELETORES_BOTAO = ['#textchat-input button[type="submit"]', '#textchat-input .btn'];
+
+  // Igual ao Beyond20: o botão de enviar é o PRIMEIRO botão da área #textchat-input.
+  function acharBotao(doc, campo) {
+    const area = doc.getElementById('textchat-input') || (campo && campo.parentElement);
+    return area ? area.getElementsByTagName('button')[0] || null : null;
+  }
+
+  function descrever(el) {
+    const visivel = !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
+    const pais = [];
+    let p = el.parentElement;
+    for (let i = 0; p && i < 3; i++, p = p.parentElement) pais.push(p.id ? `#${p.id}` : p.tagName.toLowerCase());
+    return `${el.tagName.toLowerCase()} id="${el.id}" class="${el.className}" name="${el.getAttribute('name') || ''}" type="${el.getAttribute('type') || ''}" placeholder="${el.getAttribute('placeholder') || ''}" texto="${(el.textContent || '').trim().slice(0, 30)}" visível=${visivel ? 'sim' : 'não'} pais=${pais.join(' < ')}`;
+  }
+
+  // Resumo do que existe na área do chat, para o mestre colar na conversa se o envio falhar.
+  function diagnostico(doc = globalThis.document) {
+    const fora = (el) => !el.closest('#assistente-rc');
+    const area = doc.getElementById('textchat-input');
+    const linhas = [`#textchat-input: ${area ? 'sim' : 'não'}`];
+    if (area) [...area.querySelectorAll('textarea, button, [contenteditable]')].forEach((el) => linhas.push('  ' + descrever(el)));
+    const campos = [...doc.querySelectorAll('textarea, [contenteditable="true"]')].filter(fora);
+    linhas.push(`campos de texto na página: ${campos.length}`);
+    campos.slice(0, 8).forEach((el) => linhas.push('  ' + descrever(el)));
+    return linhas.join('\n');
+  }
 
   function copiar(texto, doc) {
     try {
@@ -86,7 +111,7 @@
     const rascunho = ler();
     escrever(texto);
     campo.dispatchEvent(new Event('input', { bubbles: true }));
-    const botao = SELETORES_BOTAO.map((s) => doc.querySelector(s)).find(Boolean);
+    const botao = acharBotao(doc, campo);
     let via = 'botao';
     if (botao) {
       botao.click();
@@ -107,7 +132,7 @@
     return { ok: true, via };
   }
 
-  const api = { montarAtaque, montarDano, montarMagia, montarDanoMagia, montarCura, montarCovil, enviar, dobrarDados };
+  const api = { montarAtaque, montarDano, montarMagia, montarDanoMagia, montarCura, montarCovil, enviar, dobrarDados, diagnostico, copiar };
   globalThis.AssistenteRC = globalThis.AssistenteRC || {};
   globalThis.AssistenteRC.chat = api;
   if (typeof module !== 'undefined') module.exports = api;

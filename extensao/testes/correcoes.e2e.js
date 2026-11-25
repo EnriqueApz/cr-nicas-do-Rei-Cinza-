@@ -134,6 +134,28 @@ const texto = (page, sel) => page.textContent(`#assistente-rc ${sel}`);
     await p.close();
   });
 
+  await caso('Roll20 com mais de um botão: clica no primeiro, como o Beyond20', async () => {
+    const p = await abrir(context, 'roll20-dois-botoes.html');
+    await comecar(p);
+    await p.click('#assistente-rc .arc-cartao button[data-kind="ataque"][data-acao="maca"]');
+    await p.waitForTimeout(600);
+    const m = await p.$$eval('#mensagens li', (lis) => lis.map((l) => l.textContent));
+    assert.equal(m.length, 1);
+    assert.equal(!!(await p.$('#assistente-rc .arc-erro-chat')), false);
+    const diag = await p.evaluate(() => AssistenteRC.chat.diagnostico(document));
+    assert.match(diag, /#textchat-input: sim/);
+    assert.match(diag, /button.*Send/);
+    await p.close();
+  });
+
+  await caso('a faixa vermelha tem o botão de diagnóstico', async () => {
+    const p = await abrir(context, 'roll20-nao-limpa.html');
+    await comecar(p);
+    await p.click('#assistente-rc .arc-cartao button[data-kind="ataque"][data-acao="maca"]');
+    await p.waitForSelector('#assistente-rc .arc-erro-chat [data-a="diagnostico"]', { timeout: 3000 });
+    await p.close();
+  });
+
   await browser.close();
   console.log(`# pass ${passou}`);
 })().catch((e) => { console.error('not ok -', e.message); process.exit(1); });

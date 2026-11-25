@@ -72,7 +72,8 @@
         naoRecebeu: 'O Roll20 não recebeu a rolagem. O comando ficou no campo do chat: clique lá e aperte Enter.',
       };
       h += `<div class="arc-erro-chat">${textos[ui.erroChat]}
-        <textarea readonly>${esc(ui.ultimoComando)}</textarea> <button data-a="fechar-erro">ok</button></div>`;
+        <textarea readonly>${esc(ui.ultimoComando)}</textarea> <button data-a="fechar-erro">ok</button>
+        <button data-a="diagnostico" title="Copia um resumo do chat do Roll20 para mandar ao Claude">Copiar diagnóstico</button></div>`;
     }
     if (ui.mensagem) h += `<div class="arc-info">${esc(ui.mensagem)} <button data-a="fechar-info">ok</button></div>`;
     return h;
@@ -305,6 +306,14 @@
         return undefined;
       case 'fechar-info': ui.mensagem = ''; return render();
       case 'fechar-erro': ui.erroChat = null; return render();
+      case 'diagnostico': {
+        const texto = C.diagnostico(document);
+        ui.mensagem = C.copiar(texto, document)
+          ? 'Diagnóstico copiado. Cole na conversa com o Claude (Ctrl+V).'
+          : 'Não consegui copiar o diagnóstico. Ele está no campo da faixa vermelha.';
+        ui.ultimoComando = texto;
+        return render();
+      }
       case 'comecar': return mudar(E.iniciar(lerIniciativas(estado)));
       case 'remover': return mudar(E.removerCombatente(lerIniciativas(estado), el.dataset.id));
       case 'adicionar': return mudar(E.adicionarCombatente(lerIniciativas(estado), D.fichas[el.dataset.ficha]));
