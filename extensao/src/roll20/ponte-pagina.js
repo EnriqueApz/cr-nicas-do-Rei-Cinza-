@@ -24,9 +24,34 @@
     return 'sem-jquery';
   }
 
+  // Ordem de turnos pelo modelo interno do Roll20 (funciona mesmo com a janela Turn Order fechada).
+  function lerIniciativa() {
+    const C = window.Campaign;
+    if (!C || typeof C.get !== 'function') return null;
+    let ordem = C.get('turnorder');
+    if (typeof ordem === 'string') ordem = ordem ? JSON.parse(ordem) : [];
+    if (!Array.isArray(ordem)) return null;
+    const pagina = typeof C.activePage === 'function' ? C.activePage() : null;
+    return ordem.map((t) => {
+      let nome = t.custom || '';
+      if (!nome && t.id && pagina && pagina.thegraphics && typeof pagina.thegraphics.get === 'function') {
+        const g = pagina.thegraphics.get(t.id);
+        if (g && typeof g.get === 'function') nome = g.get('name') || '';
+      }
+      return { nome, valor: t.pr };
+    });
+  }
+
   window.addEventListener('message', (ev) => {
     const d = ev.data;
-    if (ev.source !== window || !d || d.origem !== 'assistente-rc' || d.tipo !== 'enviar') return;
+    if (ev.source !== window || !d || d.origem !== 'assistente-rc') return;
+    if (d.tipo === 'iniciativa') {
+      let entradas = null;
+      try { entradas = lerIniciativa(); } catch (_) { entradas = null; }
+      window.postMessage({ origem: 'assistente-rc-ponte', tipo: 'iniciativa-resultado', entradas }, '*');
+      return;
+    }
+    if (d.tipo !== 'enviar') return;
     let via;
     try { via = enviar(String(d.texto)); } catch (e) { via = 'erro: ' + e.message; }
     window.postMessage({ origem: 'assistente-rc-ponte', tipo: 'resultado', via }, '*');

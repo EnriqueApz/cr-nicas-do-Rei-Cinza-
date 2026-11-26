@@ -1,0 +1,17 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Roll20 com ordem de turnos</title></head>
+<body style="background:#ddd">
+<div id="textchat-input"><textarea></textarea><button type="submit" class="btn">Send</button></div>
+<ul id="mensagens"></ul>
+<div id="initiativewindow"><ul class="characterlist">
+  <li class="token" data-tokenid="a"><span class="initiative">22</span><span class="name">Tobias Greim</span></li>
+  <li class="token" data-tokenid="b"><span class="initiative">18</span><span class="name">Véspero Vaelorik</span></li>
+  <li class="token" data-tokenid="c"><span class="initiative">14</span><span class="name">Cultista</span></li>
+  <li class="token" data-tokenid="d"><span class="initiative">9</span><span class="name">Cultista</span></li>
+</ul></div>
+<script>
+  const area = document.querySelector('#textchat-input textarea');
+  document.querySelector('#textchat-input .btn').addEventListener('click', () => {
+    const li = document.createElement('li'); li.textContent = area.value;
+    document.getElementById('mensagens').appendChild(li); area.value = '';
+  });
+</script></body></html>

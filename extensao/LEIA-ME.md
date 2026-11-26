@@ -24,6 +24,7 @@ Se a rolagem **não** aparecer no chat, me avise. Até lá, o painel mostra uma 
 
 ## Usar na luta
 
+- **Iniciativa automática:** role a iniciativa dos monstros no Roll20 (com o token selecionado). Ela entra na ordem de turnos do Roll20 e o painel copia sozinho. Dê aos tokens os mesmos nomes do painel ("Cultista 1", "Raiz 2") para cada um ir ao lugar certo; se o token se chamar só "Cultista", vai para o próximo cultista sem iniciativa. Se não vier, clique em "Puxar iniciativa do Roll20", e se ainda assim não vier, em "Copiar diagnóstico" e mande ao Claude.
 - **Antes de começar:** o padrão já está em **5 jogadores** e **Tobias preparado** (Escudo da Fé e Auxílio ativos, mais 2 cultistas). Marque "Ritual completo" se o ritual tiver terminado. Depois digite a iniciativa de cada monstro e clique em "Começar luta".
 - **"Próximo ▶"** passa o turno. A ação de covil aparece sozinha na iniciativa 20 de cada rodada.
 - **O cartão do turno** mostra os avisos, a melhor jogada, a fala e os botões de rolar. "Ficha completa" abre todas as ações e magias.

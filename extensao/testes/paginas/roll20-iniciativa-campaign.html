@@ -1,0 +1,17 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Roll20 com Campaign</title></head>
+<body style="background:#ddd">
+<div id="textchat-input"><textarea></textarea><button type="submit" class="btn">Send</button></div>
+<ul id="mensagens"></ul>
+<script>
+  const area = document.querySelector('#textchat-input textarea');
+  document.querySelector('#textchat-input .btn').addEventListener('click', () => {
+    const li = document.createElement('li'); li.textContent = area.value;
+    document.getElementById('mensagens').appendChild(li); area.value = '';
+  });
+
+  const graficos = { t1: 'Tobias Greim', t2: 'Raiz 3', t3: 'Lobo 1' };
+  window.Campaign = {
+    get: (k) => (k === 'turnorder' ? JSON.stringify([{ id: 't1', pr: '21' }, { id: 't2', pr: 6 }, { id: 'x', pr: 15, custom: 'Lobo' }]) : null),
+    activePage: () => ({ thegraphics: { get: (id) => (graficos[id] ? { get: () => graficos[id] } : null) } }),
+  };
+</script></body></html>

@@ -106,7 +106,9 @@
       <label>Jogadores <select data-a="jogadores">${opc(4, '4', estado.jogadores)}${opc(5, '5', estado.jogadores)}</select></label>
       <label>Chegada <select data-a="chegada">${Object.entries(CHEGADAS).map(([v, t]) => opc(v, t, estado.chegada)).join('')}</select></label>
       <label class="arc-check"><input type="checkbox" data-a="ritual"${estado.ritualCompleto ? ' checked' : ''}> Ritual completo (+15 PV temporários)</label>
-      <p>Digite a iniciativa de cada um:</p>
+      <p>Iniciativa: role no Roll20 e ela vem sozinha da ordem de turnos, ou digite aqui.
+        <button data-a="puxar-iniciativa">Puxar iniciativa do Roll20</button>
+        <button data-a="diagnostico" title="Copia um resumo do chat e da ordem de turnos para mandar ao Claude">Copiar diagnóstico</button></p>
       ${linhas}
       <div class="arc-adicionar">Adicionar: ${adicionar}</div>
       <div class="arc-motivo">Mude Jogadores e Chegada antes de tirar ou pôr inimigos: trocar essas opções remonta a lista.</div>
@@ -371,6 +373,14 @@
         ui.ultimoComando = texto;
         return render();
       }
+      case 'puxar-iniciativa':
+        puxarIniciativa((n) => {
+          ui.mensagem = n > 0
+            ? `${n} iniciativa(s) copiadas da ordem de turnos do Roll20.`
+            : 'Não achei iniciativas de monstros na ordem de turnos do Roll20. Abra a janela "Turn Order" e confira os nomes dos tokens.';
+          render();
+        });
+        return undefined;
       case 'comecar': return mudar(E.iniciar(lerIniciativas(estado)));
       case 'remover': return mudar(E.removerCombatente(lerIniciativas(estado), el.dataset.id));
       case 'adicionar': return mudar(E.adicionarCombatente(lerIniciativas(estado), D.fichas[el.dataset.ficha]));
@@ -466,6 +476,46 @@
     });
   }
 
+  // ---------- iniciativa vinda do Roll20 ----------
+  // Pede a ordem de turnos à ponte da página; se ela não responder, lê a janela Turn Order.
+  function lerOrdemDoRoll20(feito) {
+    let respondeu = false;
+    const ouvir = (ev) => {
+      const d = ev.data;
+      if (ev.source !== window || !d || d.origem !== 'assistente-rc-ponte' || d.tipo !== 'iniciativa-resultado') return;
+      window.removeEventListener('message', ouvir);
+      respondeu = true;
+      feito(d.entradas && d.entradas.length ? d.entradas : A.iniciativa.lerTrackerDom(document));
+    };
+    window.addEventListener('message', ouvir);
+    window.postMessage({ origem: 'assistente-rc', tipo: 'iniciativa' }, '*');
+    setTimeout(() => {
+      if (respondeu) return;
+      window.removeEventListener('message', ouvir);
+      feito(A.iniciativa.lerTrackerDom(document));
+    }, 300);
+  }
+
+  // Copia para o painel as iniciativas novas. Escreve direto nos campos para não tirar o foco de quem digita.
+  function puxarIniciativa(depois) {
+    if (!estado || estado.iniciado) return;
+    lerOrdemDoRoll20((entradas) => {
+      if (!estado || estado.iniciado) return;
+      const achadas = A.iniciativa.casarIniciativa(estado.combatentes, entradas || []);
+      let e = estado;
+      let mudou = false;
+      for (const [id, valor] of Object.entries(achadas)) {
+        if (e.combatentes[id].iniciativa === valor) continue;
+        e = E.definirIniciativa(e, id, valor);
+        mudou = true;
+        const campo = raizEl.querySelector(`input[data-ini="${id}"]`);
+        if (campo) campo.value = String(valor);
+      }
+      if (mudou) { estado = e; S.salvar(estado); }
+      if (depois) depois(Object.keys(achadas).length);
+    });
+  }
+
   async function montar(corpo = document.body) {
     if (document.getElementById('assistente-rc')) return;
     raizEl = document.createElement('div');
@@ -495,6 +545,7 @@
     raizEl.addEventListener('keydown', aoTeclar);
     prepararArraste();
     render();
+    setInterval(() => puxarIniciativa(), 1500);
   }
 
   A.painel = { montar };

@@ -79,6 +79,10 @@
     const campos = [...doc.querySelectorAll('textarea, [contenteditable="true"]')].filter(fora);
     linhas.push(`campos de texto na página: ${campos.length}`);
     campos.slice(0, 8).forEach((el) => linhas.push('  ' + descrever(el)));
+    const ordem = doc.getElementById('initiativewindow');
+    const itens = ordem ? ordem.querySelectorAll('li') : [];
+    linhas.push(`#initiativewindow: ${ordem ? 'sim' : 'não'}, itens: ${itens.length}`);
+    [...itens].slice(0, 3).forEach((li) => linhas.push('  ' + li.outerHTML.replace(/\s+/g, ' ').slice(0, 300)));
     return linhas.join('\n');
   }
 

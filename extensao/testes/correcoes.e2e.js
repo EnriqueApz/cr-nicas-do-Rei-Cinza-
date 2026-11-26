@@ -213,6 +213,30 @@ const texto = (page, sel) => page.textContent(`#assistente-rc ${sel}`);
     await p.close();
   });
 
+  await caso('iniciativa da ordem de turnos do Roll20 vai sozinha para o painel', async () => {
+    const p = await abrir(context, 'roll20-iniciativa-dom.html');
+    await p.waitForFunction(() => document.querySelector('#assistente-rc input[data-ini="cultista-2"]').value === '9', null, { timeout: 5000 });
+    assert.equal(await p.inputValue('#assistente-rc input[data-ini="tobias"]'), '22');
+    assert.equal(await p.inputValue('#assistente-rc input[data-ini="cultista-1"]'), '14');
+    // uma rolagem nova entra na ordem de turnos e aparece no painel
+    await p.evaluate(() => {
+      const li = document.createElement('li');
+      li.innerHTML = '<span class="initiative">7</span><span class="name">Raiz 2</span>';
+      document.querySelector('#initiativewindow ul').appendChild(li);
+    });
+    await p.waitForFunction(() => document.querySelector('#assistente-rc input[data-ini="raiz-2"]').value === '7', null, { timeout: 5000 });
+    await p.close();
+  });
+
+  await caso('iniciativa lida do Campaign do Roll20 (pela ponte da página)', async () => {
+    const p = await abrir(context, 'roll20-iniciativa-campaign.html');
+    await p.click('#assistente-rc [data-a="puxar-iniciativa"]');
+    await p.waitForFunction(() => document.querySelector('#assistente-rc input[data-ini="raiz-3"]').value === '6', null, { timeout: 5000 });
+    assert.equal(await p.inputValue('#assistente-rc input[data-ini="tobias"]'), '21');
+    assert.equal(await p.inputValue('#assistente-rc input[data-ini="lobo-1"]'), '15');
+    await p.close();
+  });
+
   await browser.close();
   console.log(`# pass ${passou}`);
 })().catch((e) => { console.error('not ok -', e.message); process.exit(1); });
