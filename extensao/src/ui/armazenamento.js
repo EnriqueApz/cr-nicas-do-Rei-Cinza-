@@ -1,90 +1,47 @@
-// Guarda o combate: chrome.storage.local na extensão, localStorage na página de teste.
+// Guarda a luta e as preferências do painel no armazenamento do próprio Chrome
+// (nas páginas de teste, que não são extensão, usa o da página).
 (function () {
-  const CHAVE = 'assistente-m01c06';
-  const temChrome = () => typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local;
+  const naExtensao = () => typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local;
 
-  function salvar(estado) {
+  function gravar(chave, valor) {
     try {
-      if (temChrome()) chrome.storage.local.set({ [CHAVE]: estado });
-      else localStorage.setItem(CHAVE, JSON.stringify(estado));
-    } catch (_) { /* sem armazenamento: a luta continua só na memória */ }
+      if (naExtensao()) chrome.storage.local.set({ [chave]: valor });
+      else window.localStorage.setItem(chave, JSON.stringify(valor));
+    } catch (_) { /* sem armazenamento: vale só nesta visita */ }
   }
 
-  function carregar() {
+  function ler(chave) {
     return new Promise((resolve) => {
       try {
-        if (temChrome()) chrome.storage.local.get(CHAVE, (r) => resolve((r && r[CHAVE]) || null));
-        else resolve(JSON.parse(localStorage.getItem(CHAVE) || 'null'));
+        if (naExtensao()) chrome.storage.local.get(chave, (r) => resolve((r && r[chave]) || null));
+        else resolve(JSON.parse(window.localStorage.getItem(chave) || 'null'));
       } catch (_) { resolve(null); }
     });
   }
 
-  function limpar() {
+  function apagar(chave) {
     try {
-      if (temChrome()) chrome.storage.local.remove(CHAVE);
-      else localStorage.removeItem(CHAVE);
-    } catch (_) { /* nada a limpar */ }
+      if (naExtensao()) chrome.storage.local.remove(chave);
+      else window.localStorage.removeItem(chave);
+    } catch (_) { /* nada a apagar */ }
   }
 
-  const CHAVE_POS = 'assistente-posicao';
-
-  function salvarPosicao(pos) {
-    try {
-      if (temChrome()) chrome.storage.local.set({ [CHAVE_POS]: pos });
-      else localStorage.setItem(CHAVE_POS, JSON.stringify(pos));
-    } catch (_) { /* posição só nesta visita */ }
-  }
-
-  function carregarPosicao() {
-    return new Promise((resolve) => {
-      try {
-        if (temChrome()) chrome.storage.local.get(CHAVE_POS, (r) => resolve((r && r[CHAVE_POS]) || null));
-        else resolve(JSON.parse(localStorage.getItem(CHAVE_POS) || 'null'));
-      } catch (_) { resolve(null); }
-    });
-  }
-
-  // Ligações dos botões às ações das fichas do Roll20. Ficam separadas da luta: "Recomeçar" não apaga.
-  const CHAVE_VINC = 'assistente-vinculos';
-
-  function salvarVinculos(v) {
-    try {
-      if (temChrome()) chrome.storage.local.set({ [CHAVE_VINC]: v });
-      else localStorage.setItem(CHAVE_VINC, JSON.stringify(v));
-    } catch (_) { /* ligações só nesta visita */ }
-  }
-
-  function carregarVinculos() {
-    return new Promise((resolve) => {
-      try {
-        if (temChrome()) chrome.storage.local.get(CHAVE_VINC, (r) => resolve((r && r[CHAVE_VINC]) || null));
-        else resolve(JSON.parse(localStorage.getItem(CHAVE_VINC) || 'null'));
-      } catch (_) { resolve(null); }
-    });
-  }
-
-  // Preferências do mestre (seguir o Roll20, barra de PV). "Recomeçar" não apaga.
-  const CHAVE_PREF = 'assistente-preferencias';
-
-  function salvarPreferencias(v) {
-    try {
-      if (temChrome()) chrome.storage.local.set({ [CHAVE_PREF]: v });
-      else localStorage.setItem(CHAVE_PREF, JSON.stringify(v));
-    } catch (_) { /* só nesta visita */ }
-  }
-
-  function carregarPreferencias() {
-    return new Promise((resolve) => {
-      try {
-        if (temChrome()) chrome.storage.local.get(CHAVE_PREF, (r) => resolve((r && r[CHAVE_PREF]) || null));
-        else resolve(JSON.parse(localStorage.getItem(CHAVE_PREF) || 'null'));
-      } catch (_) { resolve(null); }
-    });
-  }
+  // Cada coisa guardada tem o seu nome. "Recomeçar luta" só apaga a luta.
+  const LUTA = 'assistente-m01c06';
+  const POSICAO = 'assistente-posicao';
+  const LIGACOES = 'assistente-vinculos';
+  const PREFERENCIAS = 'assistente-preferencias';
 
   globalThis.AssistenteRC = globalThis.AssistenteRC || {};
   globalThis.AssistenteRC.armazenamento = {
-    salvar, carregar, limpar, salvarPosicao, carregarPosicao, salvarVinculos, carregarVinculos,
-    salvarPreferencias, carregarPreferencias,
+    salvar: (v) => gravar(LUTA, v),
+    carregar: () => ler(LUTA),
+    limpar: () => apagar(LUTA),
+    salvarPosicao: (v) => gravar(POSICAO, v),
+    carregarPosicao: () => ler(POSICAO),
+    salvarVinculos: (v) => gravar(LIGACOES, v),
+    carregarVinculos: () => ler(LIGACOES),
+    salvarPreferencias: (v) => gravar(PREFERENCIAS, v),
+    carregarPreferencias: () => ler(PREFERENCIAS),
   };
 })();
