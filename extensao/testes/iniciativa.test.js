@@ -38,3 +38,25 @@ test('nome exato tem preferência sobre o genérico', () => {
   ]);
   assert.deepEqual(r, { 'cultista-1': 20, 'cultista-2': 9 });
 });
+
+test('nomes do jogo do mestre: Cultista da Raiz N, Dire Wolf N, Raiz Sanguinolenta N', () => {
+  let e = E.criarCombate(dados, { jogadores: 5, chegada: 'preparado', ritualCompleto: false });
+  e = E.removerCombatente(e, 'cultista-3');
+  e = E.removerCombatente(e, 'cultista-4');
+  e = E.adicionarCombatente(e, dados.fichas.lobo);
+  const r = I.casarIniciativa(e.combatentes, [
+    { nome: 'Tobias Greim', valor: 22 },
+    { nome: 'Raiz Sanguinolenta 3', valor: 19 },
+    { nome: 'Dire Wolf 2', valor: 17 },
+    { nome: 'Cultista da Raiz 2', valor: 15 },
+    { nome: 'Raiz Sanguinolenta 1', valor: 12 },
+    { nome: 'Dire Wolf 1', valor: 11 },
+    { nome: 'Cultista da Raiz 1', valor: 8 },
+    { nome: 'Raiz Sanguinolenta 4', valor: 6 },
+    { nome: 'Raiz Sanguinolenta 2', valor: 4 },
+  ]);
+  assert.deepEqual(r, {
+    tobias: 22, 'raiz-3': 19, 'lobo-2': 17, 'cultista-2': 15, 'raiz-1': 12,
+    'lobo-1': 11, 'cultista-1': 8, 'raiz-4': 6, 'raiz-2': 4,
+  });
+});

@@ -1,6 +1,12 @@
 // Lê a ordem de turnos (Turn Order) do Roll20 e liga cada entrada a um monstro do painel.
 (function () {
-  const TIPOS = ['tobias', 'cultista', 'raiz', 'lobo'];
+  // Palavras que identificam cada tipo no nome do token (a ordem importa: "Cultista da Raiz" é cultista).
+  const TIPOS = [
+    { tipo: 'tobias', palavras: ['tobias'] },
+    { tipo: 'cultista', palavras: ['cultista', 'cultist'] },
+    { tipo: 'lobo', palavras: ['lobo', 'wolf'] },
+    { tipo: 'raiz', palavras: ['raiz', 'root'] },
+  ];
 
   const normalizar = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 
@@ -21,12 +27,22 @@
       const c = lista.find((x) => normalizar(x.nome) === e.nome && !(x.id in resultado));
       if (c) { resultado[c.id] = e.valor; usadas.add(e.i); }
     }
-    // 2) nome genérico ("Cultista", "Raiz Sanguinolenta", "Tobias Greim"): próximo daquele tipo
+    // 2) nome do Roll20 ("Raiz Sanguinolenta 3", "Dire Wolf 2"): o tipo vem das palavras e o número
+    //    do fim do nome; sem número (ou número sem par no painel), vai para o próximo daquele tipo.
+    const pendentes = [];
     for (const e of validas) {
       if (usadas.has(e.i)) continue;
-      const tipo = TIPOS.find((t) => e.nome.includes(t));
-      if (!tipo) continue;
-      const c = lista.find((x) => x.fichaId === tipo && !(x.id in resultado));
+      const achado = TIPOS.find((t) => t.palavras.some((p) => e.nome.includes(p)));
+      if (!achado) continue;
+      const num = (e.nome.match(/(\d+)\s*$/) || [])[1];
+      const id = achado.tipo === 'tobias' ? 'tobias' : `${achado.tipo}-${num}`;
+      if (num !== undefined || achado.tipo === 'tobias') {
+        if (combatentes[id] && !(id in resultado)) { resultado[id] = e.valor; usadas.add(e.i); continue; }
+      }
+      pendentes.push({ ...e, tipo: achado.tipo });
+    }
+    for (const e of pendentes) {
+      const c = lista.find((x) => x.fichaId === e.tipo && !(x.id in resultado));
       if (c) { resultado[c.id] = e.valor; usadas.add(e.i); }
     }
     return resultado;
