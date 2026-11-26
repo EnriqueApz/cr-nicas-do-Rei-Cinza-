@@ -56,6 +56,45 @@
     return lista.map((g) => ({ tokenId: g.id, nome: g.get('name') || '' })).filter((t) => t.nome);
   }
 
+  // Personagem (ficha) que o token representa, com os atributos que interessam ao painel.
+  // Os atributos do Roll20 só carregam quando alguém pede: a primeira leitura pode vir sem eles.
+  const INTERESSA = /^(hp|npc_hp|hit_?points|pv|hp_max|npc_hp_max|hit_?points_max|ac|npc_ac|armor_?class|ca|npc|npc_name|npc_type)$/;
+  function lerPersonagem(id, diag) {
+    const C = window.Campaign;
+    const ch = id && C && C.characters && typeof C.characters.get === 'function' ? C.characters.get(id) : null;
+    if (!ch) return null;
+    const lista = (ch.attribs && ch.attribs.models) || [];
+    if (!lista.length && ch.attribs && typeof ch.attribs.fetch === 'function' && !ch.__assistentePediu) {
+      ch.__assistentePediu = true;
+      try { ch.attribs.fetch(ch.attribs); } catch (_) { /* tenta na próxima leitura */ }
+    }
+    const atributos = {};
+    for (const a of lista) {
+      const nome = String(a.get('name') || '').toLowerCase();
+      if (INTERESSA.test(nome)) atributos[nome] = { atual: a.get('current'), max: a.get('max') };
+    }
+    const r = {
+      id, nome: ch.get('name') || '', controlado: ch.get('controlledby') || '', carregado: lista.length > 0, atributos,
+    };
+    if (diag) {
+      r.campos = Object.keys(ch.attributes || {}).slice(0, 40);
+      r.nomesAtributos = lista.map((a) => a.get('name')).slice(0, 120);
+    }
+    return r;
+  }
+
+  // Tokens da página com barras e ficha: [{tokenId, nome, barras, personagem}].
+  function lerFichas(diag) {
+    const p = paginaAtiva();
+    if (!p) return null;
+    const lista = p.thegraphics.models || [];
+    return lista.filter((g) => g.get('name') || g.get('represents')).map((g) => {
+      const barras = {};
+      for (const i of [1, 2, 3]) barras[i] = { valor: g.get(`bar${i}_value`), max: g.get(`bar${i}_max`), link: g.get(`bar${i}_link`) || '' };
+      return { tokenId: g.id, nome: g.get('name') || '', barras, personagem: lerPersonagem(g.get('represents'), diag) };
+    });
+  }
+
   // Escreve PV/PV máx. na barra do token. barra: 1, 2, 3 ou 'auto' (a barra com o maior máximo,
   // que é a de PV: a de CA, quando existe, tem máximo pequeno ou vazio).
   function escreverPv({ tokenId, pv, pvMax, barra, permitirLigada }) {
@@ -89,6 +128,12 @@
       let tokens = null;
       try { tokens = lerTokens(); } catch (_) { tokens = null; }
       window.postMessage({ origem: 'assistente-rc-ponte', tipo: 'tokens-resultado', pedido: d.pedido, tokens }, '*');
+      return;
+    }
+    if (d.tipo === 'fichas') {
+      let fichas = null;
+      try { fichas = lerFichas(!!d.diag); } catch (e) { fichas = null; }
+      window.postMessage({ origem: 'assistente-rc-ponte', tipo: 'fichas-resultado', pedido: d.pedido, fichas }, '*');
       return;
     }
     if (d.tipo === 'pv') {

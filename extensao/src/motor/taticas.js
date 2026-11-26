@@ -111,6 +111,7 @@
     if (!c) return { avisos: [], jogadas: [] };
     if (c.fichaId === 'tobias') return sugerirTobias(estado);
     const cfg = capangas[c.fichaId];
+    if (!cfg) return { avisos: [], jogadas: [] };
     const acao = dados.fichas[c.fichaId].acoes[cfg.acaoId];
     return {
       avisos: [cfg.aviso],

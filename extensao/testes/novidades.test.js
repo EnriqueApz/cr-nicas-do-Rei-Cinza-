@@ -114,3 +114,51 @@ test('turnos: monstro caído', () => {
   const r = R.passo({ chave: 'x', pr: 8 }, [{ nome: 'Raiz Sanguinolenta 1', valor: 5 }], e);
   assert.equal(r.acao.tipo, 'caido');
 });
+
+const F = require('../src/roll20/fichas.js');
+
+test('fichas: PV e CA vêm da ficha; sem ficha, PV vem da barra do token', () => {
+  assert.deepEqual(F.extrair({ barras: { 1: { valor: 40, max: 22 } }, personagem: { atributos: { hp: { atual: 40, max: 40 }, ac: { atual: '13' } } } }),
+    { pv: 40, ca: 13, origemPv: 'ficha', origemCa: 'ficha' });
+  assert.deepEqual(F.extrair({ barras: { 1: { valor: 18, max: '' }, 3: { valor: 30, max: 30 } }, personagem: null }),
+    { pv: 30, ca: null, origemPv: 'token', origemCa: null });
+  assert.deepEqual(F.extrair({ barras: {}, personagem: { atributos: { npc_ac: { atual: 11 }, hp_max: { atual: 59 } } } }),
+    { pv: 59, ca: 11, origemPv: 'ficha', origemCa: 'ficha' });
+});
+
+test('aplicarFicha troca PV e CA antes da luta; Auxílio e Escudo continuam somando', () => {
+  let e = E.criarCombate(dados, { jogadores: 5, chegada: 'preparado', ritualCompleto: false });
+  e = E.aplicarFicha(e, 'tobias', { pv: 140, ca: 17 });
+  const t = e.combatentes.tobias;
+  assert.equal(t.pvMax, 145);
+  assert.equal(t.pv, 145);
+  assert.equal(t.ca, 19);
+  assert.equal(t.origemPv, 'ficha');
+  assert.equal(E.aplicarFicha(e, 'tobias', { pv: 140, ca: 17 }), e, 'sem mudança devolve o mesmo estado');
+  // limiar da Fé Fraturada: metade de 140
+  for (const id of Object.keys(e.combatentes)) e = E.definirIniciativa(e, id, 5);
+  e = E.iniciar(e);
+  assert.equal(E.aplicarFicha(e, 'tobias', { pv: 1 }), e, 'depois de começar não muda');
+  let r = E.aplicarDano(e, 'tobias', 145 - 71);
+  const fe = (ev) => ev.some((x) => x.tipo === 'limiarFeFraturada');
+  assert.equal(fe(r.eventos), false, '71 PV: ainda acima do limiar de 70');
+  r = E.aplicarDano(r.estado, 'tobias', 2);
+  assert.equal(fe(r.eventos), true);
+});
+
+test('adicionarDoMapa: monstro fora da bíblia entra na luta', () => {
+  let e = E.criarCombate(dados, { jogadores: 4, chegada: 'normal', ritualCompleto: false });
+  e = E.adicionarDoMapa(e, { nome: 'Ogro', pv: 59, ca: 11, tokenId: 'o1', personagemId: 'ch9', chaveAcoes: 'p:ch9' });
+  const o = e.combatentes['mapa-1'];
+  assert.equal(o.nome, 'Ogro');
+  assert.equal(o.pvMax, 59);
+  assert.equal(o.ca, 11);
+  assert.equal(E.adicionarDoMapa(e, { nome: 'Sem PV' }), e);
+  for (const id of Object.keys(e.combatentes)) e = E.definirIniciativa(e, id, 5);
+  e = E.iniciar(e);
+  e = E.sincronizar(e, { id: 'mapa-1' });
+  assert.deepEqual(require('../src/motor/taticas.js').sugerir(e, 'mapa-1'), { avisos: [], jogadas: [] });
+  e = E.adicionarDoMapa(e, { nome: 'Ogro', pv: 59, ca: null });
+  assert.equal(e.combatentes['mapa-2'].ca, 10);
+  assert.ok(e.ordem.includes('mapa-2'));
+});

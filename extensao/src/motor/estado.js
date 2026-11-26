@@ -49,6 +49,9 @@
         caido: false,
         pendenteFeFraturada: false,
         condicoes: [],
+        bonusPv: 0,
+        origemPv: 'biblia',
+        origemCa: 'biblia',
       };
     }
     const t = combatentes.tobias;
@@ -58,6 +61,7 @@
       t.espacos[2] -= 1;
       t.pv += 5;
       t.pvMax += 5;
+      t.bonusPv = 5; // Auxílio
       t.ca = caAtual(t);
     }
     if (t && ritualCompleto) t.pvTemp = 15;
@@ -173,7 +177,9 @@
 
   function limiarDe(estado, c) {
     if (c.fichaId !== 'tobias') return null;
-    return estado.jogadores === 5 ? 63 : 53;
+    // Metade do PV normal dele (sem o Auxílio): 125 → 63, 105 → 53.
+    const bonus = c.bonusPv ?? (estado.chegada === 'preparado' ? 5 : 0);
+    return Math.ceil((c.pvMax - bonus) / 2);
   }
 
   function aplicarDano(estado, id, valor) {
@@ -215,6 +221,45 @@
       id, fichaId: ficha.id, nome: `${ficha.nome} ${n}`, pv: ficha.pv, pvMax: ficha.pv, pvTemp: 0,
       caBase: ficha.ca, ca: ficha.ca, iniciativa: e.iniciado ? 20 : null, espacos: null, concentracao: null, usos: {},
       fase: 1, reacao: true, desvantagemProximoAtaque: false, caido: false, pendenteFeFraturada: false, condicoes: [],
+    };
+    const posCovil = e.ordem.indexOf('covil');
+    if (e.iniciado) e.ordem.splice(posCovil >= 0 ? posCovil + 1 : e.ordem.length, 0, id);
+    return e;
+  }
+
+  // PV e CA lidos da ficha do Roll20 (só na preparação). O Auxílio de Tobias continua somando.
+  function aplicarFicha(estado, id, { pv, ca, origemPv, origemCa } = {}) {
+    const c = estado.combatentes[id];
+    if (estado.iniciado || !c) return estado;
+    const bonus = c.bonusPv || 0;
+    const novoPv = numeroValido(pv);
+    const novaCa = numeroValido(ca);
+    const pvMax = novoPv ? novoPv + bonus : c.pvMax;
+    const caBase = novaCa || c.caBase;
+    const oPv = novoPv ? (origemPv || 'ficha') : c.origemPv;
+    const oCa = novaCa ? (origemCa || 'ficha') : c.origemCa;
+    if (pvMax === c.pvMax && caBase === c.caBase && oPv === c.origemPv && oCa === c.origemCa) return estado;
+    const e = copiar(estado);
+    const n = e.combatentes[id];
+    Object.assign(n, { pvMax, pv: pvMax, caBase, origemPv: oPv, origemCa: oCa });
+    n.ca = caAtual(n);
+    return e;
+  }
+
+  // Monstro que não está na bíblia, vindo de um token do mapa do Roll20.
+  function adicionarDoMapa(estado, { nome, pv, ca, tokenId = null, personagemId = null, chaveAcoes = null, origemPv = 'ficha', origemCa = 'ficha' }) {
+    const pvOk = numeroValido(pv);
+    if (!pvOk || !String(nome || '').trim()) return estado;
+    const e = copiar(estado);
+    let n = 1;
+    while (e.combatentes[`mapa-${n}`]) n += 1;
+    const id = `mapa-${n}`;
+    const caOk = numeroValido(ca) || 10;
+    e.combatentes[id] = {
+      id, fichaId: 'mapa', nome: String(nome).trim(), pv: pvOk, pvMax: pvOk, pvTemp: 0, caBase: caOk, ca: caOk,
+      iniciativa: e.iniciado ? 20 : null, espacos: null, concentracao: null, usos: {}, fase: 1, reacao: true,
+      desvantagemProximoAtaque: false, caido: false, pendenteFeFraturada: false, condicoes: [], bonusPv: 0,
+      origemPv, origemCa: numeroValido(ca) ? origemCa : 'padrão', tokenId, personagemId, chaveAcoes,
     };
     const posCovil = e.ordem.indexOf('covil');
     if (e.iniciado) e.ordem.splice(posCovil >= 0 ? posCovil + 1 : e.ordem.length, 0, id);
@@ -332,7 +377,7 @@
     criarCombate, definirIniciativa, iniciar, proximoTurno, turnoAnterior,
     aplicarDano, curar, gastarEspaco, adicionarCombatente, removerCombatente, definirConcentracao, marcarAbalado,
     consumirDesvantagem, responder, alternarSussurro, numeroValido, copiar,
-    sincronizar, adicionarCondicao, removerCondicao, atacaComDesvantagem, covisUsados, usarCovil,
+    sincronizar, aplicarFicha, adicionarDoMapa, adicionarCondicao, removerCondicao, atacaComDesvantagem, covisUsados, usarCovil,
   };
   globalThis.AssistenteRC = globalThis.AssistenteRC || {};
   globalThis.AssistenteRC.estado = api;

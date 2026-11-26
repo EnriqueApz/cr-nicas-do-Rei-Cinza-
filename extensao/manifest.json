@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Assistente de Combate (pessoal)",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Ajuda o mestre nos combates dentro do Roll20.",
   "permissions": [
     "storage",
@@ -20,6 +20,7 @@
         "src/roll20/chat.js",
         "src/roll20/iniciativa.js",
         "src/roll20/turnos.js",
+        "src/roll20/fichas.js",
         "src/ui/armazenamento.js",
         "src/ui/painel.js",
         "src/conteudo.js"

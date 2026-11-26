@@ -18,22 +18,36 @@
   }
   window.salvos = [];
   const lista = [
-    token('t1', 'Tobias Greim', { bar1_value: 130, bar1_max: 130, bar2_value: 18, bar2_max: '' }),
-    token('c1', 'Cultista da Raiz 1', { bar1_value: 40, bar1_max: 22 }),
-    token('c2', 'Cultista da Raiz 2', { bar1_value: 40, bar1_max: 22 }),
-    token('c3', 'Cultista da Raiz 3', { bar1_value: 40, bar1_max: 22 }),
-    token('c4', 'Cultista da Raiz 4', { bar1_value: 40, bar1_max: 22 }),
+    token('t1', 'Tobias Greim', { bar1_value: 130, bar1_max: 130, bar2_value: 18, bar2_max: '', represents: 'ch-tobias' }),
+    token('c1', 'Cultista da Raiz 1', { bar1_value: 40, bar1_max: 22, represents: 'ch-cult' }),
+    token('c2', 'Cultista da Raiz 2', { bar1_value: 40, bar1_max: 22, represents: 'ch-cult' }),
+    token('c3', 'Cultista da Raiz 3', { bar1_value: 40, bar1_max: 22, represents: 'ch-cult' }),
+    token('c4', 'Cultista da Raiz 4', { bar1_value: 40, bar1_max: 22, represents: 'ch-cult' }),
     token('r1', 'Raiz Sanguinolenta 1', { bar1_value: 13, bar1_max: 13 }),
     token('r2', 'Raiz Sanguinolenta 2', { bar1_value: 13, bar1_max: 13 }),
     token('r3', 'Raiz Sanguinolenta 3', { bar1_value: 13, bar1_max: 13 }),
     token('r4', 'Raiz Sanguinolenta 4', { bar1_value: 13, bar1_max: 13 }),
     token('w1', 'Dire Wolf 1', { bar3_value: 30, bar3_max: 30, bar3_link: '-Mhp' }),
-    token('p1', 'Véspero Vaelorik', { bar1_value: 20, bar1_max: 20 }),
+    token('p1', 'Véspero Vaelorik', { bar1_value: 20, bar1_max: 20, represents: 'ch-vespero' }),
+    token('o1', 'Ogro', { bar1_value: 59, bar1_max: 59, represents: 'ch-ogro' }),
   ];
+  // Fichas: os atributos só chegam depois que alguém pede (fetch), como no Roll20.
+  function personagem(id, name, controlledby, attrs) {
+    const dados = { name, controlledby };
+    const attribs = { models: [], fetch() { setTimeout(() => { attribs.models = attrs.map(([n, current, max]) => ({ get: (k) => ({ name: n, current, max })[k] })); }, 200); } };
+    return { id, get: (k) => dados[k], attributes: dados, attribs };
+  }
+  const fichas = {
+    'ch-tobias': personagem('ch-tobias', 'Tobias Greim', '', [['hp', 125, 125], ['ac', 16, '']]),
+    'ch-cult': personagem('ch-cult', 'Cultista da Raiz', '', [['hp', 40, 40], ['ac', 12, ''], ['npc_type', 'humanoide', '']]),
+    'ch-vespero': personagem('ch-vespero', 'Véspero', 'jogador1', [['hp', 20, 20], ['ac', 13, '']]),
+    'ch-ogro': personagem('ch-ogro', 'Ogro', '', [['hp', 59, 59], ['npc_ac', 11, '']]),
+  };
   window.tokens = Object.fromEntries(lista.map((t) => [t.id, t]));
   window.ordem = [];
   window.Campaign = {
     get: (k) => (k === 'turnorder' ? JSON.stringify(window.ordem) : null),
+    characters: { get: (id) => fichas[id] || null },
     activePage: () => ({ thegraphics: { models: lista, get: (id) => window.tokens[id] || null } }),
   };
 </script></body></html>

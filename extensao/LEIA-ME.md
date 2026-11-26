@@ -50,6 +50,21 @@ O botão fica azul com "✓ ficha". O dano dessa ação passa a sair pelos botõ
 
 Cultistas, raízes e lobos: se todos os tokens de um tipo usam a mesma ficha, basta ligar uma vez.
 
+## Novidades da versão 0.6: os números vêm das fichas do Roll20
+
+- **PV e CA saem da ficha do Roll20** de cada token. Se a ficha não tiver o PV, o painel usa a barra de PV do token. Se não der para ler nada, usa a bíblia. Na preparação, cada linha mostra de onde veio cada número: "(ficha)", "(token)" ou "(bíblia)".
+- Para isso funcionar, os tokens precisam estar **ligados à ficha** (no token: "Represents", ou "Representa") e ter nomes parecidos com os do painel ("Cultista da Raiz 1", "Dire Wolf 2").
+- Mudou alguma ficha? Clique em **"Ler fichas do Roll20"**. O painel também lê sozinho ao abrir e ao clicar em "Começar luta".
+- O Auxílio (+5 PV) e o Escudo da Fé (+2 CA) de Tobias continuam somando por cima da ficha. A Fé Fraturada passa a ser oferecida na metade do PV dele, seja qual for o PV da ficha.
+- **Monstro novo, sem falar com o Claude:**
+  1. Ponha o token no mapa, ligado à ficha.
+  2. Clique em **"+ Do mapa"** (na preparação ou na lista "Combatentes") e escolha o monstro.
+  3. No turno dele, clique em **"🔗 Ligar ação da ficha"**: na ficha, clique na ação, aperte ↑ no chat vazio, copie, cole e dê um nome ao botão.
+  4. Isso vale uma vez por ficha: todos os tokens daquela ficha ganham os botões. O ✎ troca ou apaga uma ação.
+- Monstros novos não têm "melhor jogada" (isso só existe para Tobias e seus capangas). O cartão deles mostra os botões das ações, as condições, e o dano vai para a barra do token como nos outros.
+- Para voltar a usar só a bíblia: em "⚙ Roll20", desmarque "PV e CA das fichas do Roll20".
+- Se o PV ou a CA não vierem da ficha, clique em **"Copiar diagnóstico"** e mande ao Claude: ele mostra como a sua ficha guarda os números.
+
 ## Novidades da versão 0.5
 
 - **↶ Desfazer** (no topo): volta o último passo: dano no monstro errado, turno passado sem querer, magia clicada por engano. Pode apertar várias vezes.

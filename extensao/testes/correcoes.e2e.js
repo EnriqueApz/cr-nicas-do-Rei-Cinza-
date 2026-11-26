@@ -131,7 +131,7 @@ const texto = (page, sel) => page.textContent(`#assistente-rc ${sel}`);
     await injetar(p);
     assert.equal(await p.$$eval('#assistente-rc .arc-prep .arc-nome', (els) => els.length), 9);
     await comecar(p);
-    assert.ok(await p.$('#assistente-rc [data-pv="lobo-2"]'));
+    assert.ok(await p.waitForSelector('#assistente-rc [data-pv="lobo-2"]'));
     await p.close();
   });
 
