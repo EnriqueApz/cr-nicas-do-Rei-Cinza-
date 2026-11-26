@@ -5,13 +5,19 @@
   const T = A.taticas;
   const C = A.chat;
   const S = A.armazenamento;
+  const R = A.turnos;
   const D = A.dados.m01c06;
+  const COND = A.condicoes;
 
   let estado = null;
   let vinculos = {};
   let raizEl = null;
   let bolhaEl = null;
-  const ui = { erroChat: null, ultimoComando: '', mensagem: '' };
+  const ui = { erroChat: null, ultimoComando: '', mensagem: '', vez: null };
+  let historico = [];
+  let memoriaTurno = null;
+  let prefs = { seguirRoll20: true, atualizarTokens: true, barraPv: 'auto' };
+  const avisados = new Set();
 
   const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const ficha = (c) => D.fichas[c.fichaId];
@@ -25,10 +31,106 @@
     return e;
   }
 
-  function mudar(novo) {
+  // registrar: guarda o estado anterior para o botão "Desfazer".
+  function mudar(novo, registrar = true) {
+    const antes = estado;
+    if (novo === antes) return render();
+    if (registrar && antes) {
+      historico.push(antes);
+      if (historico.length > 40) historico.shift();
+    }
     estado = novo;
     S.salvar(estado);
     render();
+    levarPvAosTokens(antes, novo);
+  }
+
+  // ---------- conversa com a ponte (página do Roll20) ----------
+  let pedidos = 0;
+  function pedirPonte(msg, tipoResposta, feito, espera = 400) {
+    const pedido = ++pedidos;
+    let respondeu = false;
+    const ouvir = (ev) => {
+      const d = ev.data;
+      if (ev.source !== window || !d || d.origem !== 'assistente-rc-ponte' || d.tipo !== tipoResposta) return;
+      if (d.pedido !== undefined && d.pedido !== pedido) return;
+      window.removeEventListener('message', ouvir);
+      respondeu = true;
+      feito(d);
+    };
+    window.addEventListener('message', ouvir);
+    window.postMessage({ origem: 'assistente-rc', pedido, ...msg }, '*');
+    setTimeout(() => {
+      if (respondeu) return;
+      window.removeEventListener('message', ouvir);
+      feito(null);
+    }, espera);
+  }
+
+  // ---------- barra de PV dos tokens ----------
+  function guardarTokens(entradas, ids) {
+    if (!estado || !estado.painel) return;
+    const mapa = { ...(estado.painel.tokens || {}) };
+    let mudou = false;
+    ids.forEach((id, i) => {
+      const tk = entradas[i] && entradas[i].tokenId;
+      if (id && id !== 'covil' && tk && mapa[id] !== tk) { mapa[id] = tk; mudou = true; }
+    });
+    if (mudou) { estado.painel = { ...estado.painel, tokens: mapa }; S.salvar(estado); }
+  }
+
+  function avisarUmaVez(chave, texto) {
+    if (avisados.has(chave)) return;
+    avisados.add(chave);
+    ui.mensagem = ui.mensagem ? `${ui.mensagem} ${texto}` : texto;
+    render();
+  }
+
+  function levarPvAosTokens(antes, novo) {
+    if (!prefs.atualizarTokens || !novo || !novo.iniciado) return;
+    const ids = Object.keys(novo.combatentes).filter((id) => {
+      const a = antes && antes.iniciado && antes.combatentes[id];
+      const n = novo.combatentes[id];
+      return !a || a.pv !== n.pv || a.pvMax !== n.pvMax;
+    });
+    if (ids.length) escreverBarras(ids);
+  }
+
+  function escreverBarras(ids) {
+    const mapa = (estado.painel && estado.painel.tokens) || {};
+    const faltam = ids.filter((id) => !mapa[id]);
+    const mandar = () => {
+      const m = (estado.painel && estado.painel.tokens) || {};
+      for (const id of ids) {
+        const c = estado.combatentes[id];
+        if (!c) continue;
+        if (!m[id]) { avisarUmaVez(`sem-token:${id}`, `Não achei no mapa o token de ${c.nome}: a barra de PV dele não muda sozinha.`); continue; }
+        pedirPonte({ tipo: 'pv', tokenId: m[id], pv: c.pv, pvMax: c.pvMax, barra: prefs.barraPv, permitirLigada: c.fichaId === 'tobias' }, 'pv-resultado', (r) => {
+          if (!r || r.ok) return;
+          const tipo = D.fichas[c.fichaId].nome;
+          const textos = {
+            'sem-barra': `Os tokens de ${tipo} não têm barra com valor máximo. Em "⚙ Roll20", escolha a barra de PV.`,
+            ligada: `A barra de PV dos tokens de ${tipo} está ligada à ficha (todos mudariam juntos), então o painel não mexe nela. Para o painel atualizar, desligue a ligação da barra nos tokens.`,
+            'sem-token': `O token de ${c.nome} não está nesta página do Roll20.`,
+          };
+          const chave = r.motivo === 'sem-token' ? `pv:${id}:sem-token` : `pv:${c.fichaId}:${r.motivo}`;
+          avisarUmaVez(chave, textos[r.motivo] || `Não consegui mudar a barra de PV de ${c.nome} (${r.motivo}).`);
+        });
+      }
+    };
+    if (!faltam.length) return mandar();
+    pedirPonte({ tipo: 'tokens' }, 'tokens-resultado', (r) => {
+      const tokens = (r && r.tokens) || [];
+      const usados = new Set(Object.values(mapa));
+      const livres = tokens.filter((t) => !usados.has(t.tokenId));
+      const achados = A.iniciativa.casarEntradas(estado.combatentes, livres);
+      const novo = { ...mapa };
+      achados.forEach((id, i) => { if (id && id !== 'covil' && !novo[id]) novo[id] = livres[i].tokenId; });
+      estado.painel = { ...estado.painel, tokens: novo };
+      S.salvar(estado);
+      mandar();
+    });
+    return undefined;
   }
 
   // ---------- envio ----------
@@ -70,6 +172,7 @@
     return `<div class="arc-topo" data-arrastar>
       <b>${esc(D.titulo)}</b>
       <span class="arc-topo-botoes">
+        <button data-a="desfazer" title="Volta o último passo (dano, turno, magia...)"${historico.length ? '' : ' disabled'}>↶ Desfazer</button>
         <button data-a="sussurro" title="Quem vê as rolagens">${estado.sussurro ? 'Só para mim' : 'Para todos'}</button>
         <button data-a="minimizar" title="Minimizar">_</button>
       </span>
@@ -173,6 +276,7 @@
     let h = `<div class="arc-cartao"><h3>Turno: ${esc(c.nome)} <small>${htmlPv(c)} PV · CA ${c.ca}</small></h3>`;
     if (c.espacos) h += `<div class="arc-espacos">Espaços: 1º ${c.espacos[1]} · 2º ${c.espacos[2]} · 3º ${c.espacos[3]}</div>`;
     h += s.avisos.map((a) => `<div class="arc-aviso">${esc(a)}</div>`).join('');
+    h += (c.condicoes || []).map((x) => `<div class="arc-aviso arc-cond-aviso"><b>${esc(COND[x].nome)}:</b> ${esc(COND[x].texto)}</div>`).join('');
     if (c.fichaId === 'tobias' && c.fase === 1 && estado.rodada > 1) {
       const v = estado.perguntas.grupoFerido;
       h += `<div class="arc-pergunta">O grupo está ferido?
@@ -194,10 +298,14 @@
   function htmlCovil() {
     const cv = T.sugerirCovil(estado);
     const covis = D.fichas.tobias.covil;
+    const usados = E.covisUsados(estado);
+    const feito = usados.length >= cv.quantidade;
+    const pendentes = cv.sugestoes.filter((s) => !usados.includes(s.covilId));
     return `<div class="arc-covil"><h3>Iniciativa 20 — ação de covil</h3>
       <div>${cv.quantidade === 2 ? 'Fase 2: Escolha 2 diferentes.' : 'Escolha 1.'}</div>
-      ${cv.sugestoes.map((s) => `<div class="arc-jogada"><b>Sugestão: ${esc(covis[s.covilId].nome)}</b><div class="arc-motivo">${esc(s.motivo)}</div></div>`).join('')}
-      <div class="arc-botoes">${cv.todas.map((id) => `<button data-rolar data-kind="covil" data-covil="${id}">${esc(covis[id].nome)}</button>`).join('')}</div>
+      ${feito ? '<div class="arc-feito">✓ Ação de covil desta rodada já usada. Clique em Próximo.</div>'
+        : pendentes.map((s) => `<div class="arc-jogada"><b>Sugestão: ${esc(covis[s.covilId].nome)}</b><div class="arc-motivo">${esc(s.motivo)}</div></div>`).join('')}
+      <div class="arc-botoes">${cv.todas.map((id) => `<button data-rolar data-kind="covil" data-covil="${id}"${usados.includes(id) ? ' class="arc-usado" title="Já usada nesta rodada"' : ''}>${usados.includes(id) ? '✓ ' : ''}${esc(covis[id].nome)}</button>`).join('')}</div>
       <div class="arc-motivo">Raízes que Prendem: ${esc(cv.motivos.raizesQuePrendem)}</div></div>`;
   }
 
@@ -205,14 +313,22 @@
     const atual = estado.ordem[estado.indice];
     const linhas = estado.ordem.filter((id) => id !== 'covil').map((id) => {
       const c = estado.combatentes[id];
+      const conds = c.condicoes || [];
+      const chips = conds.map((x) => `<button data-a="tirar-cond" data-id="${id}" data-cond="${x}" class="arc-chip" title="Tirar a condição">${esc(COND[x].nome)} ×</button>`).join('');
       return `<div class="arc-linha${c.caido ? ' arc-caido' : ''}${id === atual ? ' arc-atual' : ''}">
         <span class="arc-nome">${esc(c.nome)}${c.concentracao ? ` <small class="arc-conc">conc.: ${esc(D.fichas.tobias.magias[c.concentracao].nome)}</small>` : ''}</span>
         <span data-pv="${id}">${htmlPv(c)}</span><span>CA ${c.ca}</span>
         <input type="text" inputmode="numeric" data-dano="${id}" placeholder="dano">
         <button data-a="aplicar-dano" data-id="${id}" title="Dano">−</button>
-        <button data-a="aplicar-cura" data-id="${id}" title="Cura">+</button></div>`;
+        <button data-a="aplicar-cura" data-id="${id}" title="Cura">+</button>
+        ${chips ? `<div class="arc-conds">${chips}</div>` : ''}</div>`;
     }).join('');
-    return `<details class="arc-lista" open><summary>Combatentes</summary>${linhas}</details>`;
+    const vivos = estado.ordem.filter((id) => id !== 'covil' && !estado.combatentes[id].caido);
+    const alvo = vivos.includes(ui.condAlvo) ? ui.condAlvo : (vivos.includes(atual) ? atual : vivos[0]);
+    const por = `<div class="arc-cond-por">Pôr condição em
+      <select data-cond-alvo>${vivos.map((id) => `<option value="${id}"${id === alvo ? ' selected' : ''}>${esc(estado.combatentes[id].nome)}</option>`).join('')}</select>
+      <select data-cond-add><option value="">escolha…</option>${Object.entries(COND).map(([k, v]) => `<option value="${k}">${esc(v.nome)}</option>`).join('')}</select></div>`;
+    return `<details class="arc-lista" open><summary>Combatentes</summary>${por}${linhas}</details>`;
   }
 
   function htmlCombate() {
@@ -223,8 +339,26 @@
       <button data-a="recomecar">Recomeçar luta</button></div>`;
     h += htmlFeFraturada();
     if (t && t.caido) h += `<div class="arc-queda"><b>Tobias caiu.</b> ${esc(D.textoQueda)}</div>`;
-    h += atual === 'covil' ? htmlCovil() : htmlCartao(atual);
+    if (t && !t.caido && t.concentracao === 'imobilizarPessoa') {
+      h += '<div class="arc-aviso">Imobilizar Pessoa ativo: o alvo repete a salvaguarda de Sabedoria (CD 13) no fim de cada turno dele.</div>';
+    }
+    if (ui.vez) {
+      h += `<div class="arc-cartao arc-vez"><h3>${esc(ui.vez.titulo)}</h3><div class="arc-motivo">${esc(ui.vez.texto)}</div></div>`;
+    } else if (atual === 'tobias' && t && t.pendenteFeFraturada) {
+      h += '<div class="arc-cartao"><h3>Turno: Tobias</h3><div class="arc-aviso">Responda primeiro à Fé Fraturada (acima).</div></div>';
+    } else {
+      h += atual === 'covil' ? htmlCovil() : htmlCartao(atual);
+    }
     return h + htmlLista();
+  }
+
+  function htmlConfig() {
+    const opc = (v, t) => `<option value="${v}"${String(prefs.barraPv) === String(v) ? ' selected' : ''}>${t}</option>`;
+    return `<details class="arc-config"><summary>⚙ Roll20</summary>
+      <label class="arc-check"><input type="checkbox" data-pref="seguirRoll20"${prefs.seguirRoll20 ? ' checked' : ''}> Seguir a vez da ordem de turnos do Roll20</label>
+      <label class="arc-check"><input type="checkbox" data-pref="atualizarTokens"${prefs.atualizarTokens ? ' checked' : ''}> Levar o PV para a barra dos tokens</label>
+      <label>Barra de PV do token <select data-pref="barraPv">${opc('auto', 'Automática')}${opc(1, 'Barra 1 (verde)')}${opc(2, 'Barra 2 (azul)')}${opc(3, 'Barra 3 (vermelha)')}</select></label>
+    </details>`;
   }
 
   function render() {
@@ -233,7 +367,7 @@
     const rolagem = corpoAntes ? corpoAntes.scrollTop : 0;
     const abertos = {};
     raizEl.querySelectorAll('details[class]').forEach((d) => { abertos[d.className] = d.open; });
-    raizEl.innerHTML = htmlTopo() + `<div class="arc-corpo">${htmlAvisosGerais()}${estado.iniciado ? htmlCombate() : htmlPreparacao()}</div>`;
+    raizEl.innerHTML = htmlTopo() + `<div class="arc-corpo">${htmlAvisosGerais()}${estado.iniciado ? htmlCombate() : htmlPreparacao()}${htmlConfig()}</div>`;
     raizEl.querySelectorAll('details[class]').forEach((d) => {
       if (d.className in abertos) d.open = abertos[d.className];
     });
@@ -247,6 +381,15 @@
     let e = estado;
     const o = { sussurro: e.sussurro };
     if (kind === 'covil') {
+      const usados = E.covisUsados(e);
+      const cv = T.sugerirCovil(e);
+      const nomeCovil = D.fichas.tobias.covil[el.dataset.covil].nome;
+      if (usados.includes(el.dataset.covil) && cv.quantidade === 2) {
+        ui.mensagem = `Na Fase 2 as duas ações de covil têm de ser diferentes: ${nomeCovil} já foi usada nesta rodada.`;
+        return render();
+      }
+      if (usados.length >= cv.quantidade && !globalThis.confirm(`A ação de covil desta rodada já foi usada. Rolar ${nomeCovil} mesmo assim?`)) return undefined;
+      e = E.usarCovil(e, el.dataset.covil);
       enviarMsg(C.montarCovil(D.fichas.tobias.covil[el.dataset.covil], e.combatentes.tobias.fase, o));
       if (el.dataset.covil === 'broto' && T.sugerirCovil(e).todas.includes('broto')) {
         e = E.adicionarCombatente(e, D.fichas.raiz);
@@ -271,8 +414,8 @@
         }
         if (m.concentracao) e = E.definirConcentracao(e, c.id, el.dataset.magia);
       }
-      if (c.desvantagemProximoAtaque && kind !== 'magia') {
-        ui.mensagem = 'Tobias está abalado: este ataque é com desvantagem. Role de novo e fique com o menor.';
+      if (E.atacaComDesvantagem(c) && kind !== 'magia') {
+        ui.mensagem = `${c.nome} ataca com desvantagem (${motivoDesvantagem(c)}). Role de novo e fique com o menor.`;
         e = E.consumirDesvantagem(e, c.id);
       }
       enviarMsg(comandoFicha);
@@ -280,7 +423,7 @@
     }
     if (kind === 'ataque' || kind === 'armaAtaque') {
       const acao = kind === 'ataque' ? f.acoes[el.dataset.acao] : { nome: 'Arma Espiritual', bonus: f.magias.armaEspiritual.ataque };
-      enviarMsg(C.montarAtaque(c.nome, acao, { ...o, desvantagem: c.desvantagemProximoAtaque }));
+      enviarMsg(C.montarAtaque(c.nome, acao, { ...o, desvantagem: E.atacaComDesvantagem(c) }));
       e = E.consumirDesvantagem(e, c.id);
     } else if (kind === 'dano' || kind === 'danoCritico') {
       enviarMsg(C.montarDano(c.nome, f.acoes[el.dataset.acao], { ...o, critico: kind === 'danoCritico' }));
@@ -294,12 +437,18 @@
         e = E.gastarEspaco(e, c.id, m.circulo);
       }
       if (m.concentracao) e = E.definirConcentracao(e, c.id, el.dataset.magia);
-      enviarMsg(C.montarMagia(c.nome, m, { ...o, desvantagem: m.ataque !== undefined && c.desvantagemProximoAtaque }));
+      enviarMsg(C.montarMagia(c.nome, m, { ...o, desvantagem: m.ataque !== undefined && E.atacaComDesvantagem(c) }));
       if (m.ataque !== undefined) e = E.consumirDesvantagem(e, c.id);
     } else if (kind === 'danoMagia' || kind === 'danoMagiaCritico') {
       enviarMsg(C.montarDanoMagia(c.nome, f.magias[el.dataset.magia], { ...o, critico: kind === 'danoMagiaCritico' }));
     }
     mudar(e);
+  }
+
+  function motivoDesvantagem(c) {
+    const m = (c.condicoes || []).filter((x) => COND[x].desvantagemAtaque).map((x) => COND[x].nome.toLowerCase());
+    if (c.desvantagemProximoAtaque) m.unshift('abalado');
+    return m.join(', ');
   }
 
   function lerIniciativas(e) {
@@ -337,7 +486,15 @@
   function acao(nome, el) {
     const t = estado.combatentes.tobias;
     switch (nome) {
-      case 'sussurro': return mudar(E.alternarSussurro(estado));
+      case 'sussurro': return mudar(E.alternarSussurro(estado), false);
+      case 'desfazer': {
+        if (!historico.length) return undefined;
+        const anterior = historico.pop();
+        ui.mensagem = 'Desfeito.';
+        ui.vez = null;
+        return mudar(anterior, false);
+      }
+      case 'tirar-cond': return mudar(E.removerCondicao(estado, el.dataset.id, el.dataset.cond));
       case 'minimizar':
         raizEl.style.display = 'none';
         bolhaEl.style.display = 'flex';
@@ -381,11 +538,11 @@
           render();
         });
         return undefined;
-      case 'comecar': return mudar(E.iniciar(lerIniciativas(estado)));
+      case 'comecar': memoriaTurno = null; ui.vez = null; return mudar(E.iniciar(lerIniciativas(estado)));
       case 'remover': return mudar(E.removerCombatente(lerIniciativas(estado), el.dataset.id));
       case 'adicionar': return mudar(E.adicionarCombatente(lerIniciativas(estado), D.fichas[el.dataset.ficha]));
-      case 'proximo': return mudar(E.proximoTurno(estado));
-      case 'anterior': return mudar(E.turnoAnterior(estado));
+      case 'proximo': ui.vez = null; return mudar(E.proximoTurno(estado));
+      case 'anterior': ui.vez = null; return mudar(E.turnoAnterior(estado));
       case 'recomecar':
         if (!globalThis.confirm('Recomeçar a luta do zero?')) return undefined;
         S.limpar();
@@ -440,7 +597,27 @@
   }
 
   function aoMudar(ev) {
-    const a = ev.target.dataset && ev.target.dataset.a;
+    const ds = ev.target.dataset || {};
+    if (ds.pref) {
+      prefs = { ...prefs, [ds.pref]: ev.target.type === 'checkbox' ? ev.target.checked : ev.target.value };
+      S.salvarPreferencias(prefs);
+      avisados.clear();
+      if (ds.pref === 'seguirRoll20') { memoriaTurno = null; ui.vez = null; }
+      if (estado.iniciado && (ds.pref === 'atualizarTokens' || ds.pref === 'barraPv')) levarPvAosTokens(null, estado);
+      return render();
+    }
+    if ('condAlvo' in ds) { ui.condAlvo = ev.target.value; return undefined; }
+    if ('condAdd' in ds) {
+      if (!ev.target.value) return undefined;
+      const alvo = raizEl.querySelector('[data-cond-alvo]').value;
+      ui.condAlvo = alvo;
+      const r = E.adicionarCondicao(estado, alvo, ev.target.value);
+      if (r.estado === estado) ui.mensagem = `${estado.combatentes[alvo].nome} já está ${COND[ev.target.value].nome.toLowerCase()}.`;
+      const perdeu = r.eventos.find((x) => x.tipo === 'perdeuConcentracao');
+      if (perdeu) ui.mensagem = `${r.estado.combatentes[perdeu.id].nome} perdeu a concentração em ${D.fichas.tobias.magias[perdeu.magiaId].nome} (incapacitado).`;
+      return mudar(r.estado);
+    }
+    const a = ds.a;
     if (!['jogadores', 'chegada', 'ritual'].includes(a) || estado.iniciado) return;
     const iniciativas = {};
     raizEl.querySelectorAll('input[data-ini]').forEach((inp) => { iniciativas[inp.dataset.ini] = inp.value; });
@@ -479,21 +656,37 @@
   // ---------- iniciativa vinda do Roll20 ----------
   // Pede a ordem de turnos à ponte da página; se ela não responder, lê a janela Turn Order.
   function lerOrdemDoRoll20(feito) {
-    let respondeu = false;
-    const ouvir = (ev) => {
-      const d = ev.data;
-      if (ev.source !== window || !d || d.origem !== 'assistente-rc-ponte' || d.tipo !== 'iniciativa-resultado') return;
-      window.removeEventListener('message', ouvir);
-      respondeu = true;
-      feito(d.entradas && d.entradas.length ? d.entradas : A.iniciativa.lerTrackerDom(document));
-    };
-    window.addEventListener('message', ouvir);
-    window.postMessage({ origem: 'assistente-rc', tipo: 'iniciativa' }, '*');
-    setTimeout(() => {
-      if (respondeu) return;
-      window.removeEventListener('message', ouvir);
-      feito(A.iniciativa.lerTrackerDom(document));
+    pedirPonte({ tipo: 'iniciativa' }, 'iniciativa-resultado', (d) => {
+      const entradas = d && d.entradas && d.entradas.length ? d.entradas : A.iniciativa.lerTrackerDom(document);
+      if (estado && entradas.length) guardarTokens(entradas, A.iniciativa.casarEntradas(estado.combatentes, entradas));
+      feito(entradas);
     }, 300);
+  }
+
+  // Durante a luta: quando a vez muda na ordem de turnos do Roll20, o painel vai junto.
+  function seguirRoll20() {
+    if (!estado || !estado.iniciado || !prefs.seguirRoll20) return;
+    lerOrdemDoRoll20((entradas) => {
+      if (!estado || !estado.iniciado || !prefs.seguirRoll20) return;
+      const r = R.passo(memoriaTurno, entradas, estado);
+      memoriaTurno = r.memoria;
+      const a = r.acao;
+      if (!a) return;
+      if (a.tipo === 'ir') {
+        ui.vez = null;
+        mudar(E.sincronizar(estado, { id: a.id, novaRodada: a.novaRodada }), false);
+      } else if (a.tipo === 'covil') {
+        ui.vez = null;
+        if (a.nome && !a.depois) ui.mensagem = `Iniciativa 20: ação de covil antes da vez de ${a.nome}.`;
+        mudar(E.sincronizar(estado, { id: 'covil', novaRodada: a.novaRodada }), false);
+      } else {
+        const c = a.id ? estado.combatentes[a.id] : null;
+        ui.vez = c
+          ? { titulo: `Vez de ${c.nome}`, texto: 'Já caiu: passe a vez no Roll20 (ou tire o token da ordem de turnos).' }
+          : { titulo: `Vez de ${a.nome}`, texto: 'Jogador. O painel volta sozinho quando chegar a vez de um monstro na ordem de turnos do Roll20.' };
+        mudar(E.sincronizar(estado, { novaRodada: a.novaRodada }), false);
+      }
+    });
   }
 
   // Copia para o painel as iniciativas novas. Escreve direto nos campos para não tirar o foco de quem digita.
@@ -534,6 +727,7 @@
       : novoCombate({ jogadores: 5, chegada: 'preparado', ritualCompleto: false });
     estado.painel = estado.painel || { aguardandoCuraFe: false };
     vinculos = (await S.carregarVinculos()) || {};
+    prefs = { ...prefs, ...((await S.carregarPreferencias()) || {}) };
     const pos = await S.carregarPosicao();
     if (pos && pos.left && pos.top) {
       raizEl.style.left = pos.left;
@@ -543,9 +737,13 @@
     raizEl.addEventListener('click', aoClicar);
     raizEl.addEventListener('change', aoMudar);
     raizEl.addEventListener('keydown', aoTeclar);
+    // Teclas digitadas no painel não chegam aos atalhos do Roll20 (Delete/Backspace apagariam o token selecionado).
+    for (const tipo of ['keydown', 'keyup', 'keypress']) {
+      raizEl.addEventListener(tipo, (ev) => { if (ev.target.matches('input, textarea, select')) ev.stopPropagation(); });
+    }
     prepararArraste();
     render();
-    setInterval(() => puxarIniciativa(), 1500);
+    setInterval(() => (estado && estado.iniciado ? seguirRoll20() : puxarIniciativa()), 1500);
   }
 
   A.painel = { montar };

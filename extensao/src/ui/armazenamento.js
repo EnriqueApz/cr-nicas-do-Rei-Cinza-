@@ -63,8 +63,28 @@
     });
   }
 
+  // Preferências do mestre (seguir o Roll20, barra de PV). "Recomeçar" não apaga.
+  const CHAVE_PREF = 'assistente-preferencias';
+
+  function salvarPreferencias(v) {
+    try {
+      if (temChrome()) chrome.storage.local.set({ [CHAVE_PREF]: v });
+      else localStorage.setItem(CHAVE_PREF, JSON.stringify(v));
+    } catch (_) { /* só nesta visita */ }
+  }
+
+  function carregarPreferencias() {
+    return new Promise((resolve) => {
+      try {
+        if (temChrome()) chrome.storage.local.get(CHAVE_PREF, (r) => resolve((r && r[CHAVE_PREF]) || null));
+        else resolve(JSON.parse(localStorage.getItem(CHAVE_PREF) || 'null'));
+      } catch (_) { resolve(null); }
+    });
+  }
+
   globalThis.AssistenteRC = globalThis.AssistenteRC || {};
   globalThis.AssistenteRC.armazenamento = {
     salvar, carregar, limpar, salvarPosicao, carregarPosicao, salvarVinculos, carregarVinculos,
+    salvarPreferencias, carregarPreferencias,
   };
 })();

@@ -63,3 +63,16 @@
 #assistente-rc .arc-adicionar { margin: 6px 0 2px; }
 #assistente-rc button.arc-ligado { background: #2f5d6b; border-color: #3f8197; }
 #assistente-rc button.arc-elo { padding: 3px 5px; margin-right: 6px; opacity: .8; }
+#assistente-rc button:disabled { opacity: .45; cursor: default; }
+#assistente-rc .arc-linha { flex-wrap: wrap; }
+#assistente-rc .arc-conds { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; padding-left: 2px; }
+#assistente-rc .arc-cond-por { margin: 4px 0 6px; font-size: 12px; color: #b9b6b0; }
+#assistente-rc .arc-cond-por select { max-width: 120px; }
+#assistente-rc .arc-topo-botoes { white-space: nowrap; flex-shrink: 0; }
+#assistente-rc .arc-topo b { font-size: 12px; }
+#assistente-rc button.arc-chip { background: #5a3a6b; border-color: #7b528f; font-size: 11px; padding: 0 6px; margin: 0; }
+#assistente-rc button.arc-usado { background: #2f6b4a; border-color: #3f8f63; }
+#assistente-rc .arc-feito { margin: 6px 0; color: #9fd8b4; }
+#assistente-rc .arc-vez h3 { color: #b9c4d6; }
+#assistente-rc .arc-config { margin-top: 10px; font-size: 12px; color: #b9b6b0; }
+#assistente-rc .arc-config summary { cursor: pointer; }

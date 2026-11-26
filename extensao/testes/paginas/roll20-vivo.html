@@ -1,0 +1,39 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Roll20 vivo</title></head>
+<body style="background:#ddd">
+<div id="textchat-input"><textarea></textarea><button type="submit" class="btn">Send</button></div>
+<ul id="mensagens"></ul>
+<script>
+  const area = document.querySelector('#textchat-input textarea');
+  document.querySelector('#textchat-input .btn').addEventListener('click', () => {
+    const li = document.createElement('li'); li.textContent = area.value;
+    document.getElementById('mensagens').appendChild(li); area.value = '';
+  });
+  // Atalhos do Roll20: guardam as teclas que chegam ao documento.
+  window.teclasNoDocumento = [];
+  document.addEventListener('keydown', (e) => window.teclasNoDocumento.push(e.key));
+
+  function token(id, name, attrs) {
+    const a = { name, ...attrs };
+    return { id, get: (k) => a[k], save: (m) => { Object.assign(a, m); window.salvos.push({ id, ...m }); }, attrs: a };
+  }
+  window.salvos = [];
+  const lista = [
+    token('t1', 'Tobias Greim', { bar1_value: 130, bar1_max: 130, bar2_value: 18, bar2_max: '' }),
+    token('c1', 'Cultista da Raiz 1', { bar1_value: 40, bar1_max: 22 }),
+    token('c2', 'Cultista da Raiz 2', { bar1_value: 40, bar1_max: 22 }),
+    token('c3', 'Cultista da Raiz 3', { bar1_value: 40, bar1_max: 22 }),
+    token('c4', 'Cultista da Raiz 4', { bar1_value: 40, bar1_max: 22 }),
+    token('r1', 'Raiz Sanguinolenta 1', { bar1_value: 13, bar1_max: 13 }),
+    token('r2', 'Raiz Sanguinolenta 2', { bar1_value: 13, bar1_max: 13 }),
+    token('r3', 'Raiz Sanguinolenta 3', { bar1_value: 13, bar1_max: 13 }),
+    token('r4', 'Raiz Sanguinolenta 4', { bar1_value: 13, bar1_max: 13 }),
+    token('w1', 'Dire Wolf 1', { bar3_value: 30, bar3_max: 30, bar3_link: '-Mhp' }),
+    token('p1', 'Véspero Vaelorik', { bar1_value: 20, bar1_max: 20 }),
+  ];
+  window.tokens = Object.fromEntries(lista.map((t) => [t.id, t]));
+  window.ordem = [];
+  window.Campaign = {
+    get: (k) => (k === 'turnorder' ? JSON.stringify(window.ordem) : null),
+    activePage: () => ({ thegraphics: { models: lista, get: (id) => window.tokens[id] || null } }),
+  };
+</script></body></html>

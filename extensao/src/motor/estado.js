@@ -1,5 +1,8 @@
 // Motor de estado do combate. Funções puras: recebem um estado e devolvem outro.
 (function () {
+  const CONDICOES = (typeof module !== 'undefined')
+    ? require('../dados/condicoes.js')
+    : globalThis.AssistenteRC.condicoes;
   const copiar = (o) => JSON.parse(JSON.stringify(o));
 
   function numeroValido(valor) {
@@ -45,6 +48,7 @@
         desvantagemProximoAtaque: false,
         caido: false,
         pendenteFeFraturada: false,
+        condicoes: [],
       };
     }
     const t = combatentes.tobias;
@@ -69,6 +73,8 @@
       sussurro: true,
       perguntas: { grupoFerido: null },
       abaladoPor: [],
+      marca: -1,
+      covilUsado: { rodada: 0, ids: [] },
       combatentes,
     };
   }
@@ -110,11 +116,36 @@
     return e.combatentes[id].caido;
   }
 
+  // A reação volta no começo do turno, mas só na primeira vez que a luta chega ali:
+  // voltar (◀) e avançar de novo não devolve uma reação já gasta nem apaga o "abalado".
+  function comecarTurno(e) {
+    const pos = e.rodada * 1000 + e.indice;
+    if (pos <= (e.marca ?? -1)) return;
+    e.marca = pos;
+    const id = e.ordem[e.indice];
+    const c = id !== 'covil' ? e.combatentes[id] : null;
+    if (c && !(c.condicoes || []).some((x) => CONDICOES[x] && CONDICOES[x].incapacita)) c.reacao = true;
+  }
+
   function pularInvalidos(e, direcao) {
     const n = e.ordem.length;
     for (let i = 0; i < n && invalido(e, e.ordem[e.indice]); i++) avancar(e, direcao);
-    const id = e.ordem[e.indice];
-    if (direcao > 0 && id !== 'covil' && e.combatentes[id]) e.combatentes[id].reacao = true;
+    if (direcao > 0) comecarTurno(e);
+    return e;
+  }
+
+  // Segue a ordem de turnos do Roll20: vai direto para o turno de id (ou 'covil').
+  // novaRodada: o Roll20 voltou ao topo da ordem. Sem id (vez de um jogador), só conta a rodada.
+  function sincronizar(estado, { id = null, novaRodada = false } = {}) {
+    if (!estado.iniciado) return estado;
+    const pos = id ? estado.ordem.indexOf(id) : -1;
+    if (pos < 0 && !novaRodada) return estado;
+    const e = copiar(estado);
+    if (novaRodada) e.rodada += 1;
+    if (pos >= 0) {
+      e.indice = pos;
+      comecarTurno(e);
+    }
     return e;
   }
 
@@ -183,7 +214,7 @@
     e.combatentes[id] = {
       id, fichaId: ficha.id, nome: `${ficha.nome} ${n}`, pv: ficha.pv, pvMax: ficha.pv, pvTemp: 0,
       caBase: ficha.ca, ca: ficha.ca, iniciativa: e.iniciado ? 20 : null, espacos: null, concentracao: null, usos: {},
-      fase: 1, reacao: true, desvantagemProximoAtaque: false, caido: false, pendenteFeFraturada: false,
+      fase: 1, reacao: true, desvantagemProximoAtaque: false, caido: false, pendenteFeFraturada: false, condicoes: [],
     };
     const posCovil = e.ordem.indexOf('covil');
     if (e.iniciado) e.ordem.splice(posCovil >= 0 ? posCovil + 1 : e.ordem.length, 0, id);
@@ -242,6 +273,49 @@
     return e;
   }
 
+  // Condição num monstro. Uma condição que incapacita encerra a concentração (evento 'perdeuConcentracao').
+  function adicionarCondicao(estado, id, condicao) {
+    const c = estado.combatentes[id];
+    if (!c || !CONDICOES[condicao] || (c.condicoes || []).includes(condicao)) return { estado, eventos: [] };
+    const e = copiar(estado);
+    const n = e.combatentes[id];
+    n.condicoes = [...(n.condicoes || []), condicao];
+    const eventos = [];
+    if (CONDICOES[condicao].incapacita && n.concentracao) {
+      eventos.push({ tipo: 'perdeuConcentracao', id, magiaId: n.concentracao });
+      n.concentracao = null;
+      n.ca = caAtual(n);
+    }
+    if (CONDICOES[condicao].incapacita) n.reacao = false;
+    return { estado: e, eventos };
+  }
+
+  function removerCondicao(estado, id, condicao) {
+    const c = estado.combatentes[id];
+    if (!c || !(c.condicoes || []).includes(condicao)) return estado;
+    const e = copiar(estado);
+    e.combatentes[id].condicoes = c.condicoes.filter((x) => x !== condicao);
+    return e;
+  }
+
+  // Ataca com desvantagem? (abalado ou uma condição que dá desvantagem)
+  function atacaComDesvantagem(c) {
+    return !!c.desvantagemProximoAtaque || (c.condicoes || []).some((x) => CONDICOES[x] && CONDICOES[x].desvantagemAtaque);
+  }
+
+  // Ações de covil já usadas nesta rodada.
+  function covisUsados(estado) {
+    const u = estado.covilUsado;
+    return u && u.rodada === estado.rodada ? u.ids : [];
+  }
+
+  function usarCovil(estado, covilId) {
+    const e = copiar(estado);
+    const ids = covisUsados(estado);
+    e.covilUsado = { rodada: e.rodada, ids: ids.includes(covilId) ? ids : [...ids, covilId] };
+    return e;
+  }
+
   function responder(estado, chave, valor) {
     const e = copiar(estado);
     e.perguntas[chave] = valor;
@@ -258,6 +332,7 @@
     criarCombate, definirIniciativa, iniciar, proximoTurno, turnoAnterior,
     aplicarDano, curar, gastarEspaco, adicionarCombatente, removerCombatente, definirConcentracao, marcarAbalado,
     consumirDesvantagem, responder, alternarSussurro, numeroValido, copiar,
+    sincronizar, adicionarCondicao, removerCondicao, atacaComDesvantagem, covisUsados, usarCovil,
   };
   globalThis.AssistenteRC = globalThis.AssistenteRC || {};
   globalThis.AssistenteRC.estado = api;

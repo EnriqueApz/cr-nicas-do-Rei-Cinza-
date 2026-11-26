@@ -65,6 +65,7 @@ const texto = (page, sel) => page.textContent(`#assistente-rc ${sel}`);
     assert.match(await texto(p, '.arc-cartao'), /Espaços: 1º 3 · 2º 2 · 3º 2/);
     await p.click('#assistente-rc .arc-ficha summary');
     await p.$eval('#assistente-rc .arc-corpo', (el) => { el.scrollTop = 300; });
+    await p.$eval('#assistente-rc .arc-ficha button[data-kind="magia"][data-magia="comando"]', (b) => b.scrollIntoView({ block: 'center' }));
     const antes = await p.$eval('#assistente-rc .arc-corpo', (el) => el.scrollTop);
     assert.ok(antes > 0);
     await p.click('#assistente-rc .arc-ficha button[data-kind="magia"][data-magia="comando"]');

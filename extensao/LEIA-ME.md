@@ -50,6 +50,17 @@ O botão fica azul com "✓ ficha". O dano dessa ação passa a sair pelos botõ
 
 Cultistas, raízes e lobos: se todos os tokens de um tipo usam a mesma ficha, basta ligar uma vez.
 
+## Novidades da versão 0.5
+
+- **↶ Desfazer** (no topo): volta o último passo: dano no monstro errado, turno passado sem querer, magia clicada por engano. Pode apertar várias vezes.
+- **Teclas protegidas:** enquanto você digita no painel, Backspace e Delete não chegam ao Roll20 (não apagam o token selecionado).
+- **Condições:** na lista "Combatentes", em "Pôr condição em", escolha o monstro e a condição (Agarrado, Derrubado, Impedido, Amedrontado, Envenenado, Cego, Paralisado, Atordoado, Incapacitado). Ela aparece na linha dele e, no turno dele, o lembrete do que muda. Derrubado, Impedido, Envenenado e Cego já rolam o ataque com desvantagem. Paralisado, Atordoado e Incapacitado encerram a concentração de Tobias. Para tirar, clique na etiqueta roxa (×).
+- **Covil:** a ação usada fica verde com ✓. Na Fase 2 o painel não deixa repetir a mesma.
+- **Imobilizar Pessoa:** enquanto Tobias mantém a magia, o painel lembra que o alvo repete a salvaguarda no fim de cada turno dele.
+- **O painel segue a ordem de turnos do Roll20:** quando você passa a vez no Roll20, o painel vai junto. Na vez de um jogador ele mostra "Vez de (nome)". Quando a vez passa da iniciativa 20, ele mostra a ação de covil. Se preferir, ponha na ordem de turnos uma entrada "Covil" com 20 ("Add Custom Item"), e o covil vem dela. O botão "Próximo ▶" do painel continua funcionando.
+- **Barra de PV dos tokens:** o dano e a cura do painel vão sozinhos para a barra de PV do token no mapa. No começo da luta, as barras são acertadas com o PV do painel (isso corrige o "40/22" dos cultistas). O painel usa a barra com o maior valor máximo; para escolher outra, abra "⚙ Roll20", no fim do painel. Se a barra estiver ligada à ficha, o painel não mexe nela (senão todos os tokens daquela ficha mudariam juntos) e avisa.
+- Em **"⚙ Roll20"** você liga e desliga as duas coisas acima.
+
 ## Cuidados
 
 - **Compartilhando a tela** (Discord, por exemplo)? Minimize o painel com o botão **_**. Para reabrir, clique na bolinha ⚔.

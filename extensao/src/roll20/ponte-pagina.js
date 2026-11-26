@@ -38,8 +38,42 @@
         const g = pagina.thegraphics.get(t.id);
         if (g && typeof g.get === 'function') nome = g.get('name') || '';
       }
-      return { nome, valor: t.pr };
+      return { nome, valor: t.pr, tokenId: t.id || null };
     });
+  }
+
+  function paginaAtiva() {
+    const C = window.Campaign;
+    const p = C && typeof C.activePage === 'function' ? C.activePage() : null;
+    return p && p.thegraphics ? p : null;
+  }
+
+  // Tokens com nome na página aberta: [{tokenId, nome}].
+  function lerTokens() {
+    const p = paginaAtiva();
+    if (!p) return null;
+    const lista = p.thegraphics.models || [];
+    return lista.map((g) => ({ tokenId: g.id, nome: g.get('name') || '' })).filter((t) => t.nome);
+  }
+
+  // Escreve PV/PV máx. na barra do token. barra: 1, 2, 3 ou 'auto' (a barra com o maior máximo,
+  // que é a de PV: a de CA, quando existe, tem máximo pequeno ou vazio).
+  function escreverPv({ tokenId, pv, pvMax, barra, permitirLigada }) {
+    const p = paginaAtiva();
+    const g = p && tokenId ? p.thegraphics.get(tokenId) : null;
+    if (!g) return { ok: false, motivo: 'sem-token' };
+    let n = Number(barra);
+    if (![1, 2, 3].includes(n)) {
+      const maximos = [1, 2, 3].map((i) => ({ i, max: Number(g.get(`bar${i}_max`)) || 0 }));
+      const melhor = maximos.sort((a, b) => b.max - a.max)[0];
+      if (!melhor.max) return { ok: false, motivo: 'sem-barra' };
+      n = melhor.i;
+    }
+    // Barra ligada a um atributo da ficha: vários tokens da mesma ficha mudariam juntos.
+    if (!permitirLigada && g.get(`bar${n}_link`)) return { ok: false, motivo: 'ligada' };
+    const mudanca = { [`bar${n}_value`]: pv, [`bar${n}_max`]: pvMax };
+    if (typeof g.save === 'function') g.save(mudanca); else g.set(mudanca);
+    return { ok: true, barra: n };
   }
 
   window.addEventListener('message', (ev) => {
@@ -49,6 +83,18 @@
       let entradas = null;
       try { entradas = lerIniciativa(); } catch (_) { entradas = null; }
       window.postMessage({ origem: 'assistente-rc-ponte', tipo: 'iniciativa-resultado', entradas }, '*');
+      return;
+    }
+    if (d.tipo === 'tokens') {
+      let tokens = null;
+      try { tokens = lerTokens(); } catch (_) { tokens = null; }
+      window.postMessage({ origem: 'assistente-rc-ponte', tipo: 'tokens-resultado', pedido: d.pedido, tokens }, '*');
+      return;
+    }
+    if (d.tipo === 'pv') {
+      let r;
+      try { r = escreverPv(d); } catch (e) { r = { ok: false, motivo: 'erro: ' + e.message }; }
+      window.postMessage({ origem: 'assistente-rc-ponte', tipo: 'pv-resultado', pedido: d.pedido, tokenId: d.tokenId, ...r }, '*');
       return;
     }
     if (d.tipo !== 'enviar') return;
