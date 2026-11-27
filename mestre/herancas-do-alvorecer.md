@@ -120,6 +120,13 @@ O Maurício vai jogar de **patrulheiro** (raça e subclasse ainda em aberto). A 
 | Revelação | 6 | No antídoto da Peste Cinza, a "Oração dos Doentes" descreve as mesmas manchas da pele dele. A carta da família conta que o avô vigiava esses lugares. Ele entende que a febre de 10 anos atrás era um eco da Peste Cinza e que as caixas eram parte disso. É a cena de destaque dele. |
 | Escolha | 9 | No cerco, tocar o apito é assumir a ronda: os Cavaleiros Caídos aparecem (se a Missão 5 terminou bem). Aceitar é ganhar o Dom e o verso. Também é a redenção: Edda toma o juramento de quem quer recomeçar. |
 
+**A entrada dele (sessão 3, antes da luta com Tobias):**
+
+1. **Pego no flagra.** Anoitecendo, o grupo chega com Mira desacordada e encontra um estranho na porta de Ysolde, deixando uma trouxa com moedas e um brinquedo de madeira. O Maurício decide se mente ou se fala. Ysolde não vê a cena: se ela reconhecer os brinquedos, o segredo acaba cedo.
+2. **O cultista que fugiu.** Na estrada, ele cruzou com um homem de manto correndo, sujo de lama e seiva vermelha, e seguiu o rastro. É ele quem leva o grupo até Tobias, o que também explica por que Tobias está preparado: o cultista chegou antes.
+3. **Mira.** Desacordada, ela aperta o brinquedo de madeira na mão. Só ele sabe quem o fez.
+4. **Em particular, antes da sessão:** mande ao Maurício o que o personagem sabe (as caixas, o homem de cinza, a febre, as manchas, o mapa e o apito) e nada sobre a Peste Cinza nem sobre a Ordem.
+
 - **Na Missão 7:** quando a verdade do Relicário aparece, ele é quem mais sente o golpe duas vezes. O mapa estava certo, mas a leitura estava errada, e o homem de cinza o usou de novo.
 - **Pagamento:** o diário de Tobias fala do "homem de cinza". Deixe o patrulheiro ler essa página primeiro.
 
