@@ -56,7 +56,7 @@ A campanha já começou, então ninguém recebe a herança pronta. Cada personag
 | Mago gnomo conjurador | A Pena | 1 | 4 | 4 | 5 ou 6 |
 | Autognomo guerreiro rúnico | A Forja | 1 | 3 | 8 | 10 |
 | Véspero (bruxo, Undead Patron) | O Outro Lado | 1 | 5 | 7 | 11 |
-| Quinto personagem | A definir (ver o fim desta seção) | — | — | — | — |
+| Quinto personagem (Maurício, patrulheiro) | A Vigia | 1 ou 2 | 5 | 6 | 9 |
 
 Os números são as missões. A ordem foi pensada para começar pelo clérigo, que é o mais fácil, e terminar pelo Véspero, que é o mais pesado.
 
@@ -104,12 +104,24 @@ O Véspero é Reborn: não dorme nem sonha. Faz o descanso longo em 4 horas, par
 - **Escolha (Missão 11):** na Terra Cinzenta, a ama aparece em pessoa e pede: "Proteja o menino." Se o Véspero cantarolar a canção de ninar, Mael para de fugir e chega perto: "Só a minha ama sabia essa música." Aceitar é proteger Mael, o que abre caminho para o Final A.
 - Ele não tem verso, porque a família dele nunca jurou nada. Se proteger Mael, no Trono Cinzento a ama ensina a ele a canção de ninar. Ela funciona como o soldadinho de Vorn: o rei perde o primeiro turno. Os dois efeitos não se somam.
 
-### O quinto personagem
+### O quinto personagem: o patrulheiro do Maurício — A Vigia
 
-Ainda não está definido. Duas opções:
+O Maurício vai jogar de **patrulheiro** (raça e subclasse ainda em aberto). A história dele é "Eu trouxe a peste": há 10 anos, como carroceiro, levou caixas lacradas de Brumafria para um homem de cinza sem nome. A febre cinzenta que veio depois matou o pai de Mira. Ele tem manchas cinzentas na pele e é o benfeitor anônimo que manda dinheiro e brinquedos de madeira para Mira e Ysolde. Os jogadores não sabem da Peste Cinza; ele só sabe da parte dele.
 
-- **A Vigia:** o mapa com os seis esconderijos. Serve para qualquer andarilho. Sinal: o mapa é algo que ele já carrega sem saber o que é.
-- **O lado do vilão:** se for o personagem que matou o pai de Mira, a ligação dele é com Tobias e com o homem de cinza, não com a Ordem. Ele pode abraçar a Ordem depois, como redenção: Edda toma o juramento de quem quer recomeçar.
+- **Subclasse sugerida:** Andarilho das Trevas (o homem que se esconde) ou Senhor das Feras (a mula ou o cachorro da carroça, testemunha do que ele fez).
+- **Raça sugerida:** anão (a Resiliência Anã explica ter sobrevivido à febre), humano, halfling (entalha os brinquedos) ou orc.
+- **O objeto:** o mapa de couro com as seis marcas e o "?" é do avô dele. Ele usava o mapa para traçar rotas e nunca entendeu as marcas. O apito de osso estava junto, na mesma bolsa.
+- **A virada:** o homem de cinza não o contratou por acaso. Foi atrás dele por causa do mapa: o herdeiro da Vigia, usado como isca, como os outros. Até a culpa dele foi armada.
+
+| Etapa | Missão | O que acontece |
+|---|---|---|
+| Sinal | 1 ou 2 | Na manhã depois da queda de Tobias, uma das seis marcas do mapa está escura, como se riscada. Descreva e não explique. |
+| Pista | 5 | O mapa que Ossian dá é uma cópia do mapa da família (mesmo rasgo, mesma mancha). Se ele escrever à família, a resposta chega na Missão 6. |
+| Revelação | 6 | No antídoto da Peste Cinza, a "Oração dos Doentes" descreve as mesmas manchas da pele dele. A carta da família conta que o avô vigiava esses lugares. Ele entende que a febre de 10 anos atrás era um eco da Peste Cinza e que as caixas eram parte disso. É a cena de destaque dele. |
+| Escolha | 9 | No cerco, tocar o apito é assumir a ronda: os Cavaleiros Caídos aparecem (se a Missão 5 terminou bem). Aceitar é ganhar o Dom e o verso. Também é a redenção: Edda toma o juramento de quem quer recomeçar. |
+
+- **Na Missão 7:** quando a verdade do Relicário aparece, ele é quem mais sente o golpe duas vezes. O mapa estava certo, mas a leitura estava errada, e o homem de cinza o usou de novo.
+- **Pagamento:** o diário de Tobias fala do "homem de cinza". Deixe o patrulheiro ler essa página primeiro.
 
 ### Os versos e os Dons chegam com a escolha
 
