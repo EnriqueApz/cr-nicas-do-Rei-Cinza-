@@ -219,6 +219,24 @@ Se algo falhar, peça ao mestre o texto de **"Copiar diagnóstico"**. Ele mostra
    - rolagens sussurradas, sem faixa vermelha;
    - 🔗 com a ficha;
    - iniciativa automática;
+## 9c. Fichas da Missão 1 conferidas com a bíblia (28/11)
+
+O mestre fez o PDF "Criaturas da campanha × padrão do Roll20". Conferi as fichas e os tokens no Roll20:
+
+- **A Missão 2 já estava certa:** Rã 12·33, Lodo 10·45, Serva 13·52, Raiz 12·13, Sussurrador 14·140.
+- **Na Missão 1, corrigi as fichas** (PV para 5 jogadores):
+  - Cultista da Raiz: PV de 40 para 22;
+  - Dire Wolf (Lobo Corrompido): PV de 40 para 30;
+  - Raiz 1 (Raiz Sanguinolenta): de 25 PV e CA 15 para 13 PV e CA 12;
+  - Root Cocoon (Casulo): PV de 25 para 35;
+  - Cultist Fanatic (Maren): PV de 44 para 66;
+  - Tobias Greim: PV de 105 para 125.
+- **Tokens da página "05 - Camara da Raiz-Mae" acertados:**
+  - raízes 13·12, cultistas 22·13, lobos 30·13;
+  - Tobias 125 com CA 18, porque está preparado. O painel soma +5 do Auxílio e chega a 130.
+- As páginas 01 a 04 ficaram como estavam, porque guardam o PV que sobrou das lutas passadas.
+- O Assistente não precisou mudar: os dados dele já usavam os valores da bíblia.
+
    - seguir a vez do Roll20;
    - barra de PV;
    - "(ficha)" na preparação.
