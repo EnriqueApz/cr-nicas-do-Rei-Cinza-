@@ -1,7 +1,7 @@
 <title>Crônicas do Rei Cinza</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@500;700;800&family=Spectral:ital,wght@0,400;0,600;1,400&family=Alegreya+Sans:wght@400;500;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=Alegreya+SC:wght@500;700;800&family=Spectral:ital,wght@0,400;0,600;1,400&family=Alegreya+Sans:wght@400;500;700;800&display=swap">
 <style>
 /* Layout: menu de capítulos à esquerda, coluna de leitura no meio, sumário das cenas à direita. Cada ato tem a sua cor. */
 :root {
@@ -273,6 +273,135 @@ body.foco .folha { padding-bottom: 100px; min-height: 55vh; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* ===== Tema "Cinza e Brasa" =====
+   Layout igual; a pele muda: papel de cinza fria, títulos em tipo de prensa antiga,
+   capas como estandartes, a caixa do mestre com selo de cera. */
+:root {
+  --fundo: #e4e5e9;
+  --papel: #fbfbfc;
+  --papel-2: #f0f1f4;
+  --tinta: #1b1e24;
+  --tinta-suave: #5a6170;
+  --linha: #d6d9e0;
+  --ouro: #9a6a08;
+  --ouro-forte: #e0a63a;
+  --ouro-fundo: #fbf1dc;
+  --cera: #8f2a22;
+  --brasa: #c4532b;
+  --fio: color-mix(in srgb, var(--ouro) 38%, var(--linha));
+  --fonte-titulo: "IM Fell English SC", "Palatino Linotype", Georgia, serif;
+  --fonte-texto: "Spectral", Georgia, "Times New Roman", serif;
+  --fonte-ui: "Alegreya Sans", "Segoe UI", system-ui, sans-serif;
+  --raio: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fundo: #101217; --papel: #181b21; --papel-2: #20242c; --tinta: #e7e5df; --tinta-suave: #9da3ae; --linha: #2c313b;
+    --ouro: #e6b155; --ouro-forte: #f2c063; --ouro-fundo: #2a2316; --cera: #d0675b; --brasa: #ef8a5c; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --fundo: #101217; --papel: #181b21; --papel-2: #20242c; --tinta: #e7e5df; --tinta-suave: #9da3ae; --linha: #2c313b;
+  --ouro: #e6b155; --ouro-forte: #f2c063; --ouro-fundo: #2a2316; --cera: #d0675b; --brasa: #ef8a5c; color-scheme: dark;
+}
+body[data-ato="1"] { --ato: #2c8a62; }
+body[data-ato="2"] { --ato: #3a6cc4; }
+body[data-ato="3"] { --ato: #8a4fc4; }
+
+body {
+  background:
+    radial-gradient(900px 420px at 85% -120px, color-mix(in srgb, var(--brasa) 12%, transparent), transparent 70%),
+    radial-gradient(700px 500px at -10% 30%, color-mix(in srgb, var(--ato) 7%, transparent), transparent 70%),
+    var(--fundo);
+  background-attachment: fixed;
+}
+
+.topo { background: color-mix(in srgb, var(--fundo) 82%, transparent); border-bottom: 1px solid var(--fio); }
+.marca .sol {
+  border-radius: 50%; color: var(--ouro-fundo); font: 400 19px var(--fonte-titulo);
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--ouro-forte) 80%, #fff), var(--ouro) 75%);
+  box-shadow: 0 0 0 2px var(--papel), 0 0 0 3px var(--ouro), 0 4px 14px color-mix(in srgb, var(--ouro) 35%, transparent);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, .35);
+}
+.marca b { font: 400 21px/1 var(--fonte-titulo); letter-spacing: .02em; }
+.marca small { letter-spacing: .2em; }
+.busca input { border-color: var(--fio); }
+.busca input:focus { border-color: var(--ouro); outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--ouro-forte) 30%, transparent); }
+
+.menu h2 { font-family: var(--fonte-titulo); font-weight: 400; font-size: 13px; letter-spacing: .12em; text-transform: none; color: var(--tinta-suave); }
+.menu a { border-radius: var(--raio); position: relative; }
+.menu a .n { border-radius: 50%; font-variant-numeric: tabular-nums; }
+.menu a[aria-current="page"] { box-shadow: inset 3px 0 0 var(--cor, var(--ouro)), var(--sombra); }
+
+.capa {
+  border-radius: var(--raio);
+  padding-bottom: 26px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .18), inset 0 0 0 6px rgba(0, 0, 0, .08), inset 0 0 0 7px rgba(255, 255, 255, .14), var(--sombra);
+}
+.capa::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5;
+  background: repeating-linear-gradient(115deg, rgba(255, 255, 255, .035) 0 2px, transparent 2px 7px);
+}
+.capa .numero { font-family: var(--fonte-titulo); font-weight: 400; color: rgba(255, 255, 255, .16); }
+.capa .grupo { letter-spacing: .24em; }
+.capa h1 { font: 400 clamp(30px, 4.6vw, 46px)/1.08 var(--fonte-titulo); letter-spacing: .01em; text-shadow: 0 2px 12px rgba(0, 0, 0, .25); }
+.capa h1::after {
+  content: "✦"; display: block; margin-top: 10px; font-size: 13px; letter-spacing: 0; opacity: .75;
+  width: 120px; text-align: center; text-shadow: none;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .6) 30%, transparent 46%, transparent 54%, rgba(255, 255, 255, .6) 70%, transparent) center / 100% 1px no-repeat;
+}
+.chip { border-radius: var(--raio); }
+
+.pulos button { border-radius: var(--raio); border-color: var(--fio); }
+.folha { border-radius: var(--raio); border-color: var(--fio); position: relative; }
+.folha::before {
+  content: ""; position: absolute; left: 16px; right: 16px; top: 8px; height: 1px; pointer-events: none;
+  background: linear-gradient(90deg, transparent, var(--fio), transparent);
+}
+.conteudo h2 { font: 400 29px/1.18 var(--fonte-titulo); letter-spacing: .01em; }
+.conteudo h3 { font: 400 22px/1.3 var(--fonte-titulo); }
+.conteudo h3::before { content: "❧ "; color: var(--ouro); font-family: var(--fonte-texto); font-size: .8em; }
+.mesa h3::before { content: none; }
+.cena { border-top: 0; position: relative; }
+.cena::before {
+  content: "◆"; position: absolute; top: -10px; left: 0; right: 0; text-align: center; font-size: 10px; color: var(--ouro); line-height: 20px;
+  background: linear-gradient(90deg, transparent, var(--fio) 20%, var(--fio) 46%, transparent 46%, transparent 54%, var(--fio) 54%, var(--fio) 80%, transparent) center / 100% 1px no-repeat;
+}
+.cena-intro::before, body.foco .cena::before { content: none; }
+.check, .seguir button { border-radius: var(--raio); }
+
+.ler {
+  border-radius: var(--raio); border: 1px solid color-mix(in srgb, var(--ler) 25%, transparent);
+  border-left: 3px solid var(--ler); padding-left: 48px;
+}
+.ler::before { font-family: var(--fonte-titulo); }
+
+.mesa {
+  border-radius: var(--raio); border: 1px solid color-mix(in srgb, var(--ouro) 45%, transparent);
+  box-shadow: inset 0 0 0 4px var(--ouro-fundo), inset 0 0 0 5px color-mix(in srgb, var(--ouro) 25%, transparent);
+  padding: 22px 24px 10px; margin-top: 14px;
+}
+.mesa::after {
+  content: "R"; position: absolute; top: -14px; right: 18px; width: 38px; height: 38px; border-radius: 50%;
+  display: grid; place-items: center; color: color-mix(in srgb, #fff 85%, var(--cera)); font: 400 18px var(--fonte-titulo);
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--cera) 70%, #fff), var(--cera) 60%, color-mix(in srgb, var(--cera) 70%, #000));
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .3), inset 0 0 0 3px rgba(255, 255, 255, .12);
+}
+.mesa-selo { border-radius: var(--raio); background: var(--ouro); color: var(--ouro-fundo); }
+.mesa h3 { font: 400 20px var(--fonte-titulo); }
+
+.tabela { border-radius: var(--raio); border-color: var(--fio); }
+.tabela th { font-family: var(--fonte-titulo); font-weight: 400; font-size: 14px; letter-spacing: .04em; text-transform: none; }
+.cartao {
+  border-radius: var(--raio);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .16), inset 0 0 0 5px rgba(0, 0, 0, .08), var(--sombra);
+}
+.cartao .num { font-family: var(--fonte-titulo); font-weight: 400; }
+.cartao .nome { font: 400 20px/1.12 var(--fonte-titulo); }
+.prox-selo, .resultados { border-radius: var(--raio); }
+.barra-foco { border-color: var(--fio); }
+.btn-narrar, .btn-foco { border-radius: var(--raio); }
 </style>
 
 <header class="topo" id="topo">
