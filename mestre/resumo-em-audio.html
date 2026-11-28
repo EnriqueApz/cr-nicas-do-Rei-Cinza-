@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Resumo das Crônicas</title>
+<style>
+:root{--fundo:#f6f3ee;--texto:#2a2622;--suave:#6f675e;--borda:#ddd5ca;--destaque:#fff1c9;--botao:#7a3b2e;--botao-texto:#fff}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--fundo:#1d1f24;--texto:#e8e6e3;--suave:#a9a39b;--borda:#3a3d45;--destaque:#4a3f22;--botao:#a2503d;--botao-texto:#fff}}
+:root[data-theme="dark"]{--fundo:#1d1f24;--texto:#e8e6e3;--suave:#a9a39b;--borda:#3a3d45;--destaque:#4a3f22;--botao:#a2503d;--botao-texto:#fff}
+body{margin:0;background:var(--fundo);color:var(--texto);font:17px/1.6 system-ui,"Segoe UI",Roboto,sans-serif}
+main{max-width:720px;margin:0 auto;padding:24px 16px 80px}
+h1{font-size:24px;margin:0 0 4px}
+.sub{color:var(--suave);margin:0 0 18px}
+.controles{position:sticky;top:0;background:var(--fundo);padding:12px 0;border-bottom:1px solid var(--borda);display:flex;flex-wrap:wrap;gap:10px;align-items:center;z-index:1}
+button{background:var(--botao);color:var(--botao-texto);border:0;border-radius:8px;padding:10px 18px;font-size:16px;cursor:pointer}
+button.secundario{background:transparent;color:var(--texto);border:1px solid var(--borda)}
+select{max-width:100%;padding:8px;border-radius:8px;border:1px solid var(--borda);background:var(--fundo);color:var(--texto);font-size:15px}
+label{color:var(--suave);font-size:15px;display:flex;align-items:center;gap:6px}
+p{margin:0 0 12px;padding:6px 8px;border-radius:6px;cursor:pointer}
+p.lendo{background:var(--destaque)}
+p.titulo{font-weight:700;margin-top:18px}
+.aviso{color:var(--suave);font-size:14px;margin-top:8px}
+</style></head><body><main>
+<h1>Resumo das Crônicas do Rei Cinza</h1>
+<p class="sub" style="padding:0;cursor:default">O que mudou na história até agora. Clique em Ouvir, ou num parágrafo para começar dali.</p>
+<div class="controles">
+  <button id="ouvir">▶ Ouvir</button>
+  <button id="parar" class="secundario">■ Parar</button>
+  <label>Voz <select id="voz"></select></label>
+  <label>Velocidade <select id="vel"><option value="0.9">mais lenta</option><option value="1" selected>normal</option><option value="1.15">mais rápida</option><option value="1.3">rápida</option></select></label>
+</div>
+<p class="aviso" id="aviso" style="padding:0;cursor:default"></p>
+<div id="texto"></div>
+</main>
+<script>
+const PARAGRAFOS = ["Resumo do que mudou nas Crônicas do Rei Cinza, até agora.", "Primeiro: a espinha da história continua a mesma. O Rei Cinza, os sete fragmentos, o Relicário, a traição de Ossian na Missão sete, e os finais. Nada disso mudou. O que entrou foi uma camada nova, que liga os personagens à história.", "Mudança um. As Heranças do Alvorecer.", "Os personagens passam a ser descendentes da Ordem do Alvorecer. Quando a Ordem acabou, as famílias de cavaleiros se espalharam, e cada uma ficou com um pedaço: um objeto, uma lenda de família, e um verso do juramento.", "Assim, durante a campanha, o grupo junta duas coisas ao mesmo tempo. A Ordem, de propósito. E o Rei Cinza, sem saber, porque cada fragmento vai para o Relicário.", "No final, uma Ordem inteira enfrenta um rei inteiro.", "Mudança dois. Por que Ossian escolheu o grupo.", "Os fragmentos fogem de Ossian, mas correm para o sangue de quem partiu o rei. Os personagens são a isca. Na Missão sete, Ossian confessa isso. E, se você quiser, foi ele quem arranjou o motivo de cada um estar em Skaipia no começo.", "Mudança três. Cada um abraça a herança aos poucos.", "Ninguém recebe nada pronto. São quatro etapas: sinal, pista, revelação e escolha. E a escolha é de verdade: o personagem pode recusar.", "O clérigo da guerra fica com A Chama, os capelães. Como não dá para voltar à capela na sessão três, o sinal dele é o livro aberto no altar da raiz mãe, ou os papéis da capela de Bertrand.", "O autognomo guerreiro rúnico fica com A Forja, os ferreiros.", "O mago gnomo fica com A Pena, os cronistas. É o personagem de quem Ossian mais fica amigo.", "O Véspero fica com O Outro Lado. A patrona dele é a ama do príncipe Mael. Ele não dorme e não sonha, então os sinais aparecem acordado. O diabinho continua igual. E, na Terra Cinzenta, Mael reconhece a canção de ninar.", "Mudança quatro. O Juramento Partido.", "São seis versos, um por família. O verso de Ilsabet é: E quando acabar, eu deixo ir. Ela ensina esse verso na Missão dez. Na Missão treze, o juramento completo dá força ao grupo contra o rei, mas só com os versos de quem aceitou a herança.", "Mudança cinco. O quinto personagem, do Maurício.", "Ele é um elfo drow, patrulheiro, um caçador das sombras e arqueiro. Fugiu das cavernas e chegou à cidade por acaso. Viu maldade no pai de Mira, julgou errado, e matou o homem. Arrependido, ficou na região para proteger a família. Sabe que Mira é a única criança da cidade, e decidiu ficar, ajudar e investigar.", "Ele não tem sangue da Ordem. Nas cavernas, achou o corpo de um batedor antigo, com um mapa de couro de seis marcas e um apito de osso que não faz som. A herança dele é A Vigia, mas por escolha, não por sangue. Ele é a peça que Ossian não planejou.", "A maldade que ele viu no pai de Mira, você decide. Ou o pai era inocente, e ele matou quem protegia a menina. Ou o pai tinha feito um acordo com o culto e voltado atrás. A resposta está no diário de Tobias.", "Na sessão três, ele está na sombra, vigiando a casa de Ysolde, quando o grupo chega com Mira. Ele seguiu o rastro do cultista que fugiu, e é ele quem leva o grupo até Tobias. Isso também explica por que Tobias está preparado.", "Mudança seis. Pequenos ajustes no texto da bíblia.", "Na Missão cinco, Sor Edda deixa de ser a última descendente da Ordem e passa a ser a última que manteve o juramento. No Salão do Juramento, aparecem os versos raspados na parede.", "Na Missão sete, entra a fala de Ossian sobre a isca.", "Na Missão dez, Ilsabet ensina o sexto verso.", "Na Missão treze, entra o efeito do juramento inteiro.", "E a luta de sábado.", "Tobias está preparado, porque um cultista fugiu e avisou. Você trocou dois dos quatro cultistas por dois lobos.", "O que ainda está em aberto: revelar o Relicário na Missão sete, como a bíblia diz, ou só no final. Por enquanto, fica como está na bíblia.", "Para a sessão de sábado, o PDF continua valendo. Abra junto o material das heranças, para a entrada do drow e para o sinal do clérigo. Use a extensão na luta. E, depois que Tobias cair, uma das marcas do mapa do drow amanhece escura.", "Fim do resumo. Bom jogo no sábado."];
+const caixa = document.getElementById('texto');
+PARAGRAFOS.forEach((t, i) => {
+  const p = document.createElement('p');
+  p.textContent = t;
+  if (/^(Mudança|E a luta|O que ainda|Para a sessão|Resumo do que|Primeiro:)/.test(t)) p.className = 'titulo';
+  p.onclick = () => tocar(i);
+  caixa.appendChild(p);
+});
+const els = [...caixa.children];
+const sel = document.getElementById('voz');
+const aviso = document.getElementById('aviso');
+const fala = window.speechSynthesis;
+let vozes = [];
+function nota(v) {
+  const n = v.name.toLowerCase();
+  let s = 0;
+  if (/pt-br|pt_br/i.test(v.lang)) s += 100; else if (/^pt/i.test(v.lang)) s += 50;
+  if (/natural|online|neural/.test(n)) s += 30;
+  if (/google/.test(n)) s += 20;
+  if (/francisca|antonio|thalita/.test(n)) s += 10;
+  return s;
+}
+function carregarVozes() {
+  vozes = fala.getVoices().filter((v) => /^pt/i.test(v.lang)).sort((a, b) => nota(b) - nota(a));
+  sel.innerHTML = vozes.map((v, i) => `<option value="${i}">${v.name}</option>`).join('');
+  aviso.textContent = vozes.length ? '' : 'Não achei voz em português neste navegador. No Windows: Configurações → Hora e idioma → Fala → Adicionar vozes → Português (Brasil).';
+}
+carregarVozes();
+fala.onvoiceschanged = carregarVozes;
+// O Chrome corta falas longas: lê frase por frase.
+function frases(t) { return t.match(/[^.!?:]+[.!?:]*/g).map((x) => x.trim()).filter(Boolean); }
+let atual = -1, ativo = false;
+function marcar(i) { els.forEach((p, k) => p.classList.toggle('lendo', k === i)); if (els[i]) els[i].scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+function tocar(inicio) {
+  fala.cancel();
+  ativo = true;
+  atual = inicio;
+  lerParagrafo();
+}
+function lerParagrafo() {
+  if (!ativo || atual >= PARAGRAFOS.length) { ativo = false; marcar(-1); return; }
+  marcar(atual);
+  const lista = frases(PARAGRAFOS[atual]);
+  let k = 0;
+  const proxima = () => {
+    if (!ativo) return;
+    if (k >= lista.length) { atual += 1; setTimeout(lerParagrafo, 350); return; }
+    const u = new SpeechSynthesisUtterance(lista[k++]);
+    const v = vozes[Number(sel.value)];
+    if (v) { u.voice = v; u.lang = v.lang; } else u.lang = 'pt-BR';
+    u.rate = Number(document.getElementById('vel').value);
+    u.onend = proxima;
+    u.onerror = proxima;
+    fala.speak(u);
+  };
+  proxima();
+}
+document.getElementById('ouvir').onclick = () => tocar(atual >= 0 && atual < PARAGRAFOS.length ? atual : 0);
+document.getElementById('parar').onclick = () => { ativo = false; fala.cancel(); marcar(-1); atual = -1; };
+</script></body></html>
