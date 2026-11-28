@@ -126,6 +126,54 @@ O Véspero é Reborn: não dorme nem sonha. Faz o descanso longo em 4 horas, par
 - **Na Missão 7:** Ossian não conta com ele. O drow é o único em quem o Relicário "não pega": os fragmentos não correm para ele. Pode ser a primeira pista de que o grupo era isca.
 - **Gloom Stalker:** lembre que a Visão Umbral o deixa invisível, na escuridão, para quem enxerga no escuro (os lobos, os mortos-vivos, as criaturas da Terra Cinzenta).
 
+#### O mapa e o apito, fisicamente
+
+**O mapa:**
+
+- **Material:** um quadrado de couro curtido, do tamanho de duas mãos abertas, escuro e duro de velho. Fica dobrado em quatro, com as dobras quase rachando.
+- **Desenho:** feito a ferro quente e tinta marrom quase apagada. Montanhas, rios e estradas, mas **nenhum nome de cidade**: o mapa é de antes de várias cidades existirem. Só os rios e as montanhas batem com os mapas de hoje.
+- **As seis marcas:** seis pequenos sóis desbotados, cada um dentro de um círculo, sem legenda.
+- **O "?":** no alto, ao norte, além das montanhas, um círculo vazio com um "?" dentro.
+- **O rasgo e a mancha:** o canto de baixo, à esquerda, rasgado em diagonal, e uma mancha escura no meio. O mapa que Ossian dá na Missão 5 tem **o mesmo rasgo e a mesma mancha**.
+- **No verso:** gravado a fogo, numa letra antiga: *"Até o fim da ronda."*
+
+**O apito:** um osso fino e amarelado do tamanho de um dedo, com um furo só, preso a uma tira de couro. Ele pode usar como colar. Quem sopra não ouve som nenhum.
+
+**Para ler ao jogador quando ele olhar o mapa:**
+
+> "O couro é tão velho que estala quando você abre. Montanhas, rios, estradas que já não existem... e nenhum nome. Seis sóis pequenos, desbotados, espalhados pelo desenho. E lá no alto, além das montanhas, um círculo vazio com um ponto de interrogação. No verso, gravado a fogo: 'Até o fim da ronda.'"
+
+**O segredo das marcas:**
+
+| Marca | Lugar | Missão |
+|---|---|---|
+| 1 | Bosque Cinábrio | 1 |
+| 2 | Rio acima de Marfoz | 2 |
+| 3 | Pedreira de Grisval | 3 |
+| 4 | Arquivo de Almenara | 4 |
+| 5 | Vigília de Ferro | 5 |
+| 6 | Templo afundado de Brumafria | 6 |
+| ? | Vaenmoor, na Terra Cinzenta (Mael, que fugiu) | 11 |
+
+A cada fragmento derrotado, a marca daquele lugar escurece. A primeira escurece na manhã depois da luta com Tobias. Na Missão 11, o "?" ganha tinta e aponta para o quarto do príncipe.
+
+**Para que serve o apito:** ele chama os mortos da Ordem do Alvorecer, e só eles ouvem.
+
+| Missão | Quando ele sopra |
+|---|---|
+| 1 a 4 | Nada que alguém ouça. No máximo, um arrepio na nuca, como se alguém muito longe tivesse virado a cabeça. Não explique. |
+| 5 | No pátio, os Cavaleiros Caídos **hesitam por uma rodada** e olham para ele. Sem teste, só uma vez. Ele continua sem ouvir nada. |
+| 6 | **Ele ouve o apito pela primeira vez**, e o fantasma do batedor aparece só para ele (a revelação). |
+| 9 | **A escolha:** no cerco, tocar o apito é assumir a ronda. Se a Missão 5 terminou bem, 1d4 Cavaleiros Caídos lutam uma rodada ao lado do grupo e depois descansam. |
+
+**Imagem para o Roll20 (prompt para o Gemini):**
+
+```
+Mapa antigo desenhado em um pedaço quadrado de couro curtido escuro, visto de cima, estilo ilustração de fantasia medieval pintada à mão. Linhas marrons quase apagadas mostrando montanhas, rios e estradas, sem nenhum nome escrito. Seis pequenos símbolos de sol desbotados dentro de círculos, espalhados pelo mapa. No alto, além de uma cadeia de montanhas, um sétimo círculo vazio com um ponto de interrogação dentro. Canto inferior esquerdo rasgado em diagonal, uma mancha escura no centro, dobras rachadas em cruz. Um apito fino de osso amarelado amarrado ao canto por uma tira de couro. Fundo de mesa de madeira escura, luz de vela quente.
+```
+
+Depois da luta com Tobias, peça uma versão com o primeiro sol escurecido e troque a imagem.
+
 **A entrada dele (sessão 3, antes da luta com Tobias):**
 
 1. **Na sombra da casa de Ysolde.** Anoitecendo, o grupo chega com Mira desacordada. Um vulto de olhos claros está na sombra, vigiando a casa, como faz todas as noites. Quando é visto, não foge. O Maurício decide quanto conta.

@@ -12,7 +12,7 @@ caps = json.load(open(os.path.join(AQUI, 'capitulos.json'), encoding='utf-8'))
 
 def md(arquivo):
     texto = open(arquivo, encoding='utf-8').read()
-    h = markdown.markdown(texto, extensions=['tables', 'sane_lists'])
+    h = markdown.markdown(texto, extensions=['tables', 'sane_lists', 'fenced_code'])
     h = h.replace('<table>', '<div class="tabela"><table>').replace('</table>', '</table></div>')
     # ids nos títulos, para o sumário lateral
     vistos = {}
@@ -43,6 +43,12 @@ MESA = {
             '<strong>Mago (A Pena):</strong> no grimório há uma página numa cifra que ele nunca conseguiu ler. Às vezes um sol pequeno aparece gravado nos objetos que ele conjura.',
             '<strong>Autognomo (A Forja):</strong> entre as runas dele há uma que ele nunca aprendeu, um sol. Ela fica morna quando ele olha para o norte.',
             '<strong>Véspero (O Outro Lado):</strong> ele não dorme nem sonha. No descanso parado de 4 horas, ouve uma voz de mulher velha: "Ainda não. Mais ao norte." No rito do Magical Cunning, a voz canta duas notas de uma canção de ninar. Na Form of Dread, as cores em volta dele desbotam.',
+        ])),
+        ('O mapa e o apito do drow', '<blockquote class="ler"><div class="selo">Ler em voz alta (quando ele olhar o mapa)</div><p>"O couro é tão velho que estala quando você abre. Montanhas, rios, estradas que já não existem... e nenhum nome. Seis sóis pequenos, desbotados, espalhados pelo desenho. E lá no alto, além das montanhas, um círculo vazio com um ponto de interrogação. No verso, gravado a fogo: \'Até o fim da ronda.\'"</p></blockquote>' + li([
+            '<strong>Os seis sóis</strong> são os esconderijos dos fragmentos. O primeiro (Bosque Cinábrio) é o de Tobias. O "?" é Mael, na Terra Cinzenta.',
+            '<strong>Guarde:</strong> o canto rasgado em diagonal e a mancha no meio. O mapa que Ossian dá na Missão 5 tem os mesmos.',
+            '<strong>O apito de osso</strong> (ele pode usar como colar) chama os mortos da Ordem, e só eles ouvem. Se ele soprar nesta luta, nada que alguém veja: só um arrepio na nuca. Não explique.',
+            'Descrição completa, o que o apito faz em cada missão e um prompt de imagem para o Roll20: página <strong>Heranças do Alvorecer</strong>, seção do drow.',
         ])),
         ('Depois da luta', li([
             'Na manhã seguinte, uma das seis marcas do mapa do drow amanhece escura, como se tivesse sido riscada.',
