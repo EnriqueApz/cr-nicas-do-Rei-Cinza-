@@ -20,6 +20,8 @@
   --ler-fundo: #eaf1fd;
   --mestre: #a33a2c;           /* para o mestre */
   --mestre-fundo: #fcebe8;
+  --fala: #7a3fb0;             /* falas dos personagens */
+  --fala-fundo: #f3eafc;
   --sombra: 0 1px 2px rgba(20, 24, 33, .06), 0 8px 24px rgba(20, 24, 33, .07);
   --fonte-titulo: "Alegreya SC", "Palatino Linotype", Georgia, serif;
   --fonte-texto: "Spectral", Georgia, "Times New Roman", serif;
@@ -29,14 +31,14 @@
   :root:not([data-theme="light"]) {
     --fundo: #0f1217; --papel: #171b22; --papel-2: #1e232c; --tinta: #e6e8ec; --tinta-suave: #9aa3b1; --linha: #2b313c;
     --ouro: #f2b13a; --ouro-forte: #ffc85c; --ouro-fundo: #2a2214; --ato-fundo: #13261e;
-    --ler: #8db4ff; --ler-fundo: #16223a; --mestre: #ff9784; --mestre-fundo: #2e1915;
+    --ler: #8db4ff; --ler-fundo: #16223a; --mestre: #ff9784; --mestre-fundo: #2e1915; --fala: #d4adff; --fala-fundo: #2a1c3a;
     --sombra: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 30px rgba(0, 0, 0, .35); color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --fundo: #0f1217; --papel: #171b22; --papel-2: #1e232c; --tinta: #e6e8ec; --tinta-suave: #9aa3b1; --linha: #2b313c;
   --ouro: #f2b13a; --ouro-forte: #ffc85c; --ouro-fundo: #2a2214; --ato-fundo: #13261e;
-  --ler: #8db4ff; --ler-fundo: #16223a; --mestre: #ff9784; --mestre-fundo: #2e1915;
+  --ler: #8db4ff; --ler-fundo: #16223a; --mestre: #ff9784; --mestre-fundo: #2e1915; --fala: #d4adff; --fala-fundo: #2a1c3a;
   --sombra: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 30px rgba(0, 0, 0, .35); color-scheme: dark;
 }
 body[data-ato="1"] { --ato: #2f9a6a; }
@@ -200,6 +202,23 @@ details.prompt pre { white-space: pre-wrap; font: 13px/1.5 ui-monospace, "Cascad
 .falado { padding: 4px 8px; border-radius: 8px; transition: background .3s; }
 .falado.lendo { background: var(--ouro-fundo); }
 .carregando { color: var(--tinta-suave); font: 15px var(--fonte-ui); }
+
+/* falas e legenda */
+q.fala { quotes: none; font-style: italic; color: var(--fala); background: var(--fala-fundo); border-radius: 7px; padding: 1px 6px 1px 4px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+q.fala::before { content: "🗨 "; font-style: normal; font-size: .85em; }
+.tabela td em.fala { color: var(--fala); }
+.ler q.fala { background: transparent; padding: 0; }
+.ler q.fala::before { content: "“"; font-size: 1em; }
+.ler q.fala::after { content: "”"; }
+.legenda { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin: 0 0 18px; font: 700 13px var(--fonte-ui); color: var(--tinta-suave); }
+.legenda span { display: inline-flex; align-items: center; gap: 6px; }
+.legenda i { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
+.btn-narrar { margin-left: auto; border: 2px solid var(--fala); background: var(--papel); color: var(--fala); border-radius: 999px; padding: 6px 14px; font: 800 13px var(--fonte-ui); cursor: pointer; }
+.btn-narrar[aria-pressed="true"] { background: var(--fala); color: var(--papel); }
+body.narrar .conteudo :is(p, li, .tabela, h3, h4, .selo-mestre, details, .item):not(:has(.fala)):not(.ler *):not(.mesa-selo) { opacity: .22; }
+body.narrar .conteudo .mesa :is(h3) { opacity: .22; }
+body.narrar .conteudo .ler { box-shadow: 0 0 0 3px var(--ler); }
+body.narrar .cena.feita > :not(.cena-topo):not(.seguir) { opacity: 1; }
 
 /* festa */
 .festa { position: fixed; inset: 0; pointer-events: none; z-index: 50; overflow: hidden; }
@@ -401,6 +420,43 @@ details.prompt pre { white-space: pre-wrap; font: 13px/1.5 ui-monospace, "Cascad
     conteudo.prepend(titulo);
   }
 
+  const LEGENDA = `<div class="legenda"><span><i style="background:var(--ler)"></i>Ler em voz alta</span><span><i style="background:var(--fala)"></i>Fala de personagem</span><span><i style="background:var(--mestre)"></i>Para o mestre</span><span><i style="background:var(--ouro-forte)"></i>Sua mesa</span><button type="button" class="btn-narrar" id="btn-narrar" aria-pressed="false">🎙 Modo narração</button></div>`;
+  let narrando = ler('cronicas-narrar', false);
+
+  // Marca como fala todo trecho entre aspas que parece dito por alguém (frase com pontuação ou 4+ palavras).
+  function marcarFalas(raiz) {
+    const andar = document.createTreeWalker(raiz, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => (n.parentElement.closest('pre, code, script, .selo, .mesa-selo, .selo-mestre, q.fala, h1, h2') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+    });
+    const nos = [];
+    while (andar.nextNode()) nos.push(andar.currentNode);
+    const re = /["“]([^"”]{2,}?)["”]/g;
+    for (const n of nos) {
+      const t = n.nodeValue;
+      if (!/["“]/.test(t)) continue;
+      let m, ultimo = 0, achou = false;
+      const frag = document.createDocumentFragment();
+      re.lastIndex = 0;
+      while ((m = re.exec(t))) {
+        const dentro = m[1].trim();
+        const fala = (/[.!?…,]$/.test(dentro) || dentro.split(/\s+/).length >= 4) && !ehTitulo(semAcento(dentro));
+        if (!fala) continue;
+        achou = true;
+        frag.appendChild(document.createTextNode(t.slice(ultimo, m.index)));
+        const q = document.createElement('q');
+        q.className = 'fala';
+        q.textContent = dentro;
+        frag.appendChild(q);
+        ultimo = m.index + m[0].length;
+      }
+      if (!achou) continue;
+      frag.appendChild(document.createTextNode(t.slice(ultimo)));
+      n.parentNode.replaceChild(frag, n);
+    }
+    // falas em itálico nas tabelas da bíblia
+    raiz.querySelectorAll('.tabela td em').forEach((e) => e.classList.add('fala'));
+  }
+
   let observador = null;
   function mostrar(id) {
     const p = paginas.find((x) => x.id === id) || paginas[0];
@@ -411,8 +467,15 @@ details.prompt pre { white-space: pre-wrap; font: 13px/1.5 ui-monospace, "Cascad
       <div class="barra-missao"><div class="trilho"><i></i></div><span></span></div>` : '';
     const numero = p.num ? `<div class="numero">${p.num}</div>` : '';
     leitura.innerHTML = `<header class="capa">${numero}<p class="grupo">${esc(p.grupo)}</p><h1>${esc(p.num ? p.titulo.replace(/^Missão \d+ — /, '') : p.titulo)}</h1>${chips}</header>
-      ${p.num ? '<div class="pulos" id="pulos"></div>' : ''}<article class="folha"><div class="conteudo">${p.html}</div></article>`;
+      ${p.num ? '<div class="pulos" id="pulos"></div>' : ''}<article class="folha">${p.num ? LEGENDA : ''}<div class="conteudo">${p.html}</div></article>`;
     const conteudo = leitura.querySelector('.conteudo');
+    marcarFalas(conteudo);
+    const bn = $('btn-narrar');
+    document.body.classList.toggle('narrar', !!(narrando && p.num));
+    if (bn) {
+      bn.setAttribute('aria-pressed', String(!!narrando));
+      bn.addEventListener('click', () => { narrando = !narrando; guardar('cronicas-narrar', narrando); bn.setAttribute('aria-pressed', String(narrando)); document.body.classList.toggle('narrar', narrando); });
+    }
     const caixa = $('feita-' + p.id);
     if (caixa) caixa.addEventListener('change', () => { feitas[p.id] = caixa.checked; guardar('cronicas-feitas', feitas); montarMenu(p.id); if (caixa.checked) festejar(null); });
     if (p.id === 'inicio') inicioExtra(conteudo);
@@ -474,6 +537,8 @@ details.prompt pre { white-space: pre-wrap; font: 13px/1.5 ui-monospace, "Cascad
 
   // ---------- busca ----------
   let indice = [];
+  const TITULOS = new Set();
+  const ehTitulo = (x) => { for (const t of TITULOS) if (t === x || t.startsWith(x + ':') || t.startsWith(x + ' —')) return true; return false; };
   function montarIndice() {
     const tmp = document.createElement('div');
     indice = [];
@@ -483,6 +548,7 @@ details.prompt pre { white-space: pre-wrap; font: 13px/1.5 ui-monospace, "Cascad
         if (el.closest('li') && el.tagName !== 'LI') return;
         const t = el.textContent.replace(/\s+/g, ' ').trim();
         if (t) indice.push({ pagina: p, texto: t, tag: el.tagName });
+        if (t && /^H[2-4]$/.test(el.tagName)) TITULOS.add(semAcento(t));
       });
     }
   }

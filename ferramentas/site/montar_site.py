@@ -73,7 +73,7 @@ MESA = {
             '<strong>Drow, pista:</strong> o mapa da trilha que Ossian dá é uma cópia do mapa do batedor (mesmo rasgo, mesma mancha). Na subida, sucesso automático no desafio de perícias; no pátio, o apito faz os Cavaleiros Caídos hesitarem uma rodada.',
         ])),
         ('O que muda no texto da bíblia', li([
-            'Sor Edda deixa de ser "a última descendente da Ordem" e passa a ser "<strong>a última que manteve o juramento</strong>".',
+            'Sor Edda deixa de ser <em>a última descendente da Ordem</em> e passa a ser <strong>a última que manteve o juramento</strong>.',
             'No Salão do Juramento: os versos raspados na parede.',
         ])),
     ],
@@ -87,7 +87,7 @@ MESA = {
             '<strong>A confissão de Ossian ganha esta fala:</strong> "Os pedaços fogem de mim. Mas correm para vocês. Ele odeia quem o partiu. Eu só precisava de isca com o sangue certo. E vocês ainda me agradeceram pelo chá."',
             '<strong>Véspero, revelação:</strong> Ossian diz a palavra de comando "Vaelmorikar", e o Véspero entende. "Vaelorik" é da mesma língua antiga.',
             '<strong>Drow:</strong> Ossian não conta com ele. Os fragmentos não correm para o drow; pode ser a primeira pista de que o grupo era isca. Ele sente o golpe em dobro: o mapa estava certo, a leitura é que estava errada.',
-            '<em>Opcional:</em> a vitrine vazia da Festa da Luz diz "Ao tesouro dos Protetores"; Ossian pode propor o título de "Cavaleiros do Alvorecer de Almenara" minutos antes da palavra de comando.',
+            '<em>Opcional:</em> a vitrine vazia da Festa da Luz diz "Ao tesouro dos Protetores"; Ossian pode propor o título de <em>Cavaleiros do Alvorecer de Almenara</em> minutos antes da palavra de comando.',
         ])),
         ('Em aberto', '<p>Revelar o Relicário aqui, como a bíblia diz, ou só no final. Por enquanto, fica como está na bíblia.</p>'),
     ],
