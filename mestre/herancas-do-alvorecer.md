@@ -106,9 +106,9 @@ O Véspero é Reborn: não dorme nem sonha. Faz o descanso longo em 4 horas, par
 
 ### O quinto personagem: o patrulheiro do Maurício — A Vigia
 
-O Maurício vai jogar de **patrulheiro** (raça e subclasse ainda em aberto). A história dele é "Eu trouxe a peste": há 10 anos, como carroceiro, levou caixas lacradas de Brumafria para um homem de cinza sem nome. A febre cinzenta que veio depois matou o pai de Mira. Ele tem manchas cinzentas na pele e é o benfeitor anônimo que manda dinheiro e brinquedos de madeira para Mira e Ysolde. Os jogadores não sabem da Peste Cinza; ele só sabe da parte dele.
+O Maurício vai jogar de **patrulheiro Gloom Stalker** (Andarilho das Trevas); a raça ainda está em aberto. A história dele é "Eu trouxe a peste": há 10 anos, como carroceiro, levou caixas lacradas de Brumafria para um homem de cinza sem nome. A febre cinzenta que veio depois matou o pai de Mira. Ele tem manchas cinzentas na pele e é o benfeitor anônimo que manda dinheiro e brinquedos de madeira para Mira e Ysolde. Os jogadores não sabem da Peste Cinza; ele só sabe da parte dele.
 
-- **Subclasse sugerida:** Andarilho das Trevas (o homem que se esconde) ou Senhor das Feras (a mula ou o cachorro da carroça, testemunha do que ele fez).
+- **Subclasse: Gloom Stalker.** O homem que se esconde: Disfarçar-se é o rosto que ele usa para deixar a trouxa na porta de Ysolde. Lembre que a Visão Umbral o deixa invisível, na escuridão, para quem enxerga no escuro (os lobos, os mortos-vivos, as criaturas da Terra Cinzenta).
 - **Raça sugerida:** anão (a Resiliência Anã explica ter sobrevivido à febre), humano, halfling (entalha os brinquedos) ou orc.
 - **O objeto:** o mapa de couro com as seis marcas e o "?" é do avô dele. Ele usava o mapa para traçar rotas e nunca entendeu as marcas. O apito de osso estava junto, na mesma bolsa.
 - **A virada:** o homem de cinza não o contratou por acaso. Foi atrás dele por causa do mapa: o herdeiro da Vigia, usado como isca, como os outros. Até a culpa dele foi armada.
