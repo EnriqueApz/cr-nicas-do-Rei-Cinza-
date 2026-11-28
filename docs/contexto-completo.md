@@ -211,14 +211,6 @@ Se algo falhar, peça ao mestre o texto de **"Copiar diagnóstico"**. Ele mostra
 - Tokens novos (Gemini) em `Cronicas Rei CinzaTokensMissao 02 - O Segundo Sussurro`, no PC do mestre.
 - Lição técnica: as fichas são da ficha D&D 2024 (dados no atributo `store`). Criar ficha por código funciona clonando a estrutura de uma ficha existente. Ao abrir uma ficha, o `custom_meta1` muda de `ac.current` para `ac.total`: nunca mande valor `undefined` para um token (o Roll20 descarta o token em silêncio).
 
-## 10. Próximos passos sugeridos
-
-**Antes de sábado (o mestre testa):**
-1. Instalar a extensão (hoje 0.7.0) no Chrome.
-2. Testar no Roll20:
-   - rolagens sussurradas, sem faixa vermelha;
-   - 🔗 com a ficha;
-   - iniciativa automática;
 ## 9c. Fichas da Missão 1 conferidas com a bíblia (28/11)
 
 O mestre fez o PDF "Criaturas da campanha × padrão do Roll20". Conferi as fichas e os tokens no Roll20:
@@ -237,6 +229,14 @@ O mestre fez o PDF "Criaturas da campanha × padrão do Roll20". Conferi as fich
 - As páginas 01 a 04 ficaram como estavam, porque guardam o PV que sobrou das lutas passadas.
 - O Assistente não precisou mudar: os dados dele já usavam os valores da bíblia.
 
+## 10. Próximos passos sugeridos
+
+**Antes de sábado (o mestre testa):**
+1. Instalar a extensão (hoje 0.7.0) no Chrome.
+2. Testar no Roll20:
+   - rolagens sussurradas, sem faixa vermelha;
+   - 🔗 com a ficha;
+   - iniciativa automática;
    - seguir a vez do Roll20;
    - barra de PV;
    - "(ficha)" na preparação.
