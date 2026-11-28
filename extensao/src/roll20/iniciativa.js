@@ -1,12 +1,20 @@
 // Lê a ordem de turnos (Turn Order) do Roll20 e liga cada entrada a um monstro do painel.
 (function () {
   // Palavras que identificam cada tipo no nome do token (a ordem importa: "Cultista da Raiz" é cultista).
+  // "Serva de Raízes" vem antes de "raiz" para não virar uma Raiz.
   const TIPOS = [
     { tipo: 'tobias', palavras: ['tobias'] },
+    { tipo: 'sussurrador', palavras: ['sussurrador', 'whisperer'] },
     { tipo: 'cultista', palavras: ['cultista', 'cultist'] },
     { tipo: 'lobo', palavras: ['lobo', 'wolf'] },
+    { tipo: 'serva', palavras: ['serva de', 'root servant'] },
+    { tipo: 'lodo', palavras: ['lodo', 'ooze'] },
+    { tipo: 'ra', palavras: ['ra gigante', 'frog'] },
     { tipo: 'raiz', palavras: ['raiz', 'root'] },
   ];
+  const UNICOS = ['tobias', 'sussurrador'];
+  // Tokens que não são combatentes, mesmo com "raiz" no nome.
+  const IGNORAR = ['raiz grossa', 'casulo', 'cocoon'];
 
   const normalizar = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
 
@@ -36,11 +44,13 @@
     //    do fim do nome; sem número (ou número sem par no painel), vai para o próximo daquele tipo.
     const pendentes = [];
     for (const e of restantes) {
+      if (IGNORAR.some((p) => e.nome.includes(p))) continue;
       const achado = TIPOS.find((t) => t.palavras.some((p) => e.nome.includes(p)));
       if (!achado) continue;
       const num = (e.nome.match(/(\d+)\s*$/) || [])[1];
-      const id = achado.tipo === 'tobias' ? 'tobias' : `${achado.tipo}-${num}`;
-      if ((num !== undefined || achado.tipo === 'tobias') && combatentes[id] && !tomados.has(id)) {
+      const unico = UNICOS.includes(achado.tipo);
+      const id = unico ? achado.tipo : `${achado.tipo}-${num}`;
+      if ((num !== undefined || unico) && combatentes[id] && !tomados.has(id)) {
         ids[e.i] = id; tomados.add(id); continue;
       }
       pendentes.push({ ...e, tipo: achado.tipo });

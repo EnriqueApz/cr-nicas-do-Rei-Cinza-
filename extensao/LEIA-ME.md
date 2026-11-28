@@ -50,6 +50,22 @@ O botão fica azul com "✓ ficha". O dano dessa ação passa a sair pelos botõ
 
 Cultistas, raízes e lobos: se todos os tokens de um tipo usam a mesma ficha, basta ligar uma vez.
 
+## Novidades da versão 0.7: as lutas da Missão 2
+
+- Na preparação, o primeiro campo agora é **"Luta"**. Escolha:
+  - **M1 · Cena 6 — Tobias** (a de sempre);
+  - **M2 · Cena 4 — Rãs e Lodo Negro** (Poço Escuro);
+  - **M2 · Cena 5 — Servas e Raízes** (Bosque dos Sussurros, com "o sussurro" no começo de cada rodada);
+  - **M2 · Cena 6 — O Sussurrador** (Clareira).
+- Trocar de luta só funciona na preparação. No meio de uma luta, clique em **"Recomeçar luta"** e depois troque.
+- **O Sussurrador:**
+  - a melhor jogada: Convocar Raízes (o botão rola a recarga 1d6: 5 ou 6 pode usar) ou 2 Ataques de Raiz;
+  - covil na iniciativa 20: **Broto** (chama uma Raiz, até 6, ou 8 com 5 jogadores) ou **Voz querida**;
+  - ao passar da metade dos PV, o painel avisa o **Submergir nas Raízes**;
+  - botão **"Ritual de Ossian feito"**: tira o Submergir e lembra a vulnerabilidade a radiante.
+- Rãs: Mordida e Engolir. Lodo Negro: Cobrir (avisa quando o dano cai pela metade). Servas: Prender + Golpe de Galho.
+- No Roll20, os tokens da Missão 2 já estão com os nomes certos ("Rã Gigante Corrompida 1", "Serva de Raízes 2", "O Sussurrador"). As "Raiz Grossa" e os "Casulo" são ignorados pelo painel.
+
 ## Novidades da versão 0.6: os números vêm das fichas do Roll20
 
 - **PV e CA saem da ficha do Roll20** de cada token. Se a ficha não tiver o PV, o painel usa a barra de PV do token. Se não der para ler nada, usa a bíblia. Na preparação, cada linha mostra de onde veio cada número: "(ficha)", "(token)" ou "(bíblia)".

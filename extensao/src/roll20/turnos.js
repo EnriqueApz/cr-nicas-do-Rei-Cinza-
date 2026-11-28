@@ -19,8 +19,10 @@
     const id = ids[0];
     const antes = memoria ? memoria.pr : null;
     const novaRodada = antes !== null && pr !== null && pr > antes && id !== 'covil';
-    const t = estado.combatentes.tobias;
-    const covilVivo = t && !t.caido;
+    const chefeId = estado.chefeId !== undefined ? estado.chefeId : (estado.combatentes.tobias ? 'tobias' : null);
+    const temCovil = estado.covil !== undefined ? !!estado.covil : !!estado.combatentes.tobias;
+    const t = chefeId ? estado.combatentes[chefeId] : null;
+    const covilVivo = temCovil && (!chefeId || (!!t && !t.caido));
     const covilNaOrdem = ids.includes('covil');
     const cruzou20 = memoria && pr !== null && pr < 20 && antes !== null && (antes >= 20 || novaRodada);
     if (covilVivo && !covilNaOrdem && cruzou20) {

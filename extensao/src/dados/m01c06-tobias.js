@@ -121,8 +121,14 @@
   const dados = {
     id: 'm01c06',
     titulo: 'Missão 1 · Cena 6 — Tobias',
+    curto: 'M1 · Cena 6 — Tobias',
     fichas,
     montar,
+    chefe: 'tobias',
+    covil: true,
+    covis: fichas.tobias.covil,
+    temChegada: true,
+    adicionaveis: ['cultista', 'raiz', 'lobo'],
     falas: {
       rodada1: '"Vocês não deviam ter vindo." A voz treme. "Ela pode trazer de volta tudo o que a peste levou. Minha esposa, meus filhos."',
       negociar: '"Eu sei o que parece. Sei o que fiz. Mas vocês não ouviram o que ela promete. Não posso parar agora. Não quando estou tão perto."',

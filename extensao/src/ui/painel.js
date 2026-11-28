@@ -6,7 +6,9 @@
   const C = A.chat;
   const S = A.armazenamento;
   const R = A.turnos;
-  const D = A.dados.m01c06;
+  // Lutas que o painel conhece (Missão 1 e Missão 2). D é a luta escolhida agora.
+  const LUTAS = ['m01c06', 'm02c04', 'm02c05', 'm02c06'].filter((id) => A.dados[id]);
+  let D = A.dados.m01c06;
   const COND = A.condicoes;
   const FI = A.fichas;
 
@@ -24,6 +26,14 @@
   const ficha = (c) => D.fichas[c.fichaId];
   const CHEGADAS = { normal: 'Normal', surpresa: 'Pego de surpresa', preparado: 'Preparado' };
   const CIRCULOS = { 0: 'truque', 1: '1º', 2: '2º', 3: '3º' };
+
+  function usarLuta(id) {
+    if (A.dados[id]) D = A.dados[id];
+  }
+
+  // Ficha de um combatente (Missão 1 ou 2). Monstros do mapa não têm ficha da bíblia.
+  const chefe = () => { const id = E.chefeDe(estado); return id ? estado.combatentes[id] : null; };
+  const nomeMagia = (c, magiaId) => { const f = c && ficha(c); return (f && f.magias && f.magias[magiaId]) ? f.magias[magiaId].nome : magiaId; };
 
   function novoCombate(opcoes, sussurro = true) {
     const e = E.criarCombate(D, opcoes);
@@ -89,7 +99,7 @@
 
   // Barra ligada à ficha só pode mudar se este é o único combatente daquela ficha.
   function barraLigadaPode(c) {
-    if (c.fichaId === 'tobias') return true;
+    if (c.id === E.chefeDe(estado)) return true;
     if (c.fichaId !== 'mapa' || !c.personagemId) return false;
     return !Object.values(estado.combatentes).some((o) => o.id !== c.id && o.personagemId === c.personagemId);
   }
@@ -267,13 +277,16 @@
       <div class="arc-linha"><span class="arc-nome">${esc(c.nome)}</span>
         <span title="De onde vieram os números">PV ${c.pvMax} · CA ${c.ca} <small class="arc-origem">${esc(origem(c))}</small></span>
         <input type="number" data-ini="${c.id}" placeholder="inic." value="${c.iniciativa ?? ''}">
-        ${c.id === 'tobias' ? '<span class="arc-vazio"></span>' : `<button data-a="remover" data-id="${c.id}" title="Tirar da luta">✖</button>`}</div>`).join('');
-    const adicionar = ['cultista', 'raiz', 'lobo']
+        ${c.id === E.chefeDe(estado) ? '<span class="arc-vazio"></span>' : `<button data-a="remover" data-id="${c.id}" title="Tirar da luta">✖</button>`}</div>`).join('');
+    const adicionar = (D.adicionaveis || [])
       .map((f) => `<button data-a="adicionar" data-ficha="${f}">+ ${esc(D.fichas[f].nome)}</button>`).join('');
-    return `<div class="arc-prep">
-      <label>Jogadores <select data-a="jogadores">${opc(4, '4', estado.jogadores)}${opc(5, '5', estado.jogadores)}</select></label>
+    const lutas = LUTAS.map((id) => opc(id, esc(A.dados[id].curto || A.dados[id].titulo), D.id)).join('');
+    const extrasM1 = D.temChegada ? `
       <label>Chegada <select data-a="chegada">${Object.entries(CHEGADAS).map(([v, t]) => opc(v, t, estado.chegada)).join('')}</select></label>
-      <label class="arc-check"><input type="checkbox" data-a="ritual"${estado.ritualCompleto ? ' checked' : ''}> Ritual completo (+15 PV temporários)</label>
+      <label class="arc-check"><input type="checkbox" data-a="ritual"${estado.ritualCompleto ? ' checked' : ''}> Ritual completo (+15 PV temporários)</label>` : '';
+    return `<div class="arc-prep">
+      <label>Luta <select data-a="luta">${lutas}</select></label>
+      <label>Jogadores <select data-a="jogadores">${opc(4, '4', estado.jogadores)}${opc(5, '5', estado.jogadores)}</select></label>${extrasM1}
       <p>Iniciativa: role no Roll20 e ela vem sozinha da ordem de turnos, ou digite aqui.
         <button data-a="puxar-iniciativa">Puxar iniciativa do Roll20</button>
         <button data-a="diagnostico" title="Copia um resumo do chat e da ordem de turnos para mandar ao Claude">Copiar diagnóstico</button></p>
@@ -282,7 +295,7 @@
       ${htmlDoMapa()}
       <div class="arc-motivo">PV e CA: ${prefs.usarFichas ? 'vêm das fichas do Roll20 (ou da barra do token); "bíblia" quando não deu para ler.' : 'da bíblia (leitura das fichas desligada em ⚙ Roll20).'}
         <button data-a="ler-fichas">Ler fichas do Roll20</button></div>
-      <div class="arc-motivo">Mude Jogadores e Chegada antes de tirar ou pôr inimigos: trocar essas opções remonta a lista.</div>
+      <div class="arc-motivo">Mude Luta, Jogadores${D.temChegada ? ' e Chegada' : ''} antes de tirar ou pôr inimigos: trocar essas opções remonta a lista.</div>
       <button class="arc-principal" data-a="comecar">Começar luta</button>
     </div>`;
   }
@@ -332,16 +345,19 @@
   function htmlFicha(c) {
     const f = ficha(c);
     let h = `<details class="arc-ficha"><summary>Ficha completa</summary><div class="arc-resumo">${esc(f.resumo)}</div>`;
-    for (const [id, a] of Object.entries(f.acoes)) {
-      const dano = a.dano.map((p) => `${p.dados} ${p.tipo}`).join(' + ');
-      h += `<div class="arc-item"><b>${esc(a.nome)}</b> +${a.bonus}, ${esc(a.alcance)}. ${esc(dano)}.${a.extra ? ' ' + esc(a.extra) : ''}
-        <div class="arc-botoes">${htmlBotao({ rotulo: 'Ataque', kind: 'ataque', acaoId: id }, c.id)}${htmlBotao({ rotulo: 'Dano', kind: 'dano', acaoId: id }, c.id)}${htmlBotao({ rotulo: 'Dano crítico', kind: 'danoCritico', acaoId: id }, c.id)}</div></div>`;
+    for (const [id, a] of Object.entries(f.acoes || {})) {
+      const temDano = a.dano && a.dano.length;
+      const dano = temDano ? a.dano.map((p) => `${p.dados} ${p.tipo}`).join(' + ') + '.' : '';
+      const botoes = [htmlBotao({ rotulo: 'Ataque', kind: 'ataque', acaoId: id }, c.id)];
+      if (temDano) botoes.push(htmlBotao({ rotulo: 'Dano', kind: 'dano', acaoId: id }, c.id), htmlBotao({ rotulo: 'Dano crítico', kind: 'danoCritico', acaoId: id }, c.id));
+      h += `<div class="arc-item"><b>${esc(a.nome)}</b> +${a.bonus}, ${esc(a.alcance)}. ${esc(dano)}${a.extra ? ' ' + esc(a.extra) : ''}
+        <div class="arc-botoes">${botoes.join('')}</div></div>`;
     }
     if (f.magias) {
-      h += `<div class="arc-espacos">Espaços: 1º ${c.espacos[1]} · 2º ${c.espacos[2]} · 3º ${c.espacos[3]}</div>`;
+      if (c.espacos) h += `<div class="arc-espacos">Espaços: 1º ${c.espacos[1]} · 2º ${c.espacos[2]} · 3º ${c.espacos[3]}</div>`;
       for (const [id, m] of Object.entries(f.magias)) {
-        const tags = [CIRCULOS[m.circulo], m.tempo === 'bonus' ? 'ação bônus' : 'ação', m.concentracao ? 'concentração' : ''].filter(Boolean).join(' · ');
-        const botoes = [htmlBotao({ rotulo: 'Lançar', kind: 'magia', magiaId: id }, c.id)];
+        const tags = [m.circulo !== undefined ? CIRCULOS[m.circulo] : m.etiqueta, m.tempo === 'bonus' ? 'ação bônus' : 'ação', m.concentracao ? 'concentração' : ''].filter(Boolean).join(' · ');
+        const botoes = [htmlBotao({ rotulo: m.circulo !== undefined ? 'Lançar' : 'Usar', kind: 'magia', magiaId: id }, c.id)];
         if (m.dano) botoes.push(htmlBotao({ rotulo: 'Dano', kind: 'danoMagia', magiaId: id }, c.id));
         h += `<div class="arc-item"><b>${esc(m.nome)}</b> <i>${esc(tags)}</i>${m.cd ? ` · CD ${esc(m.cd)}` : ''}
           <div>${esc(m.efeito)}</div><div class="arc-botoes">${botoes.join('')}</div></div>`;
@@ -357,7 +373,7 @@
         <div class="arc-botoes">${htmlBotao({ rotulo: 'Ataque da arma', kind: 'armaAtaque', magiaId: 'armaEspiritual' }, c.id)}${htmlBotao({ rotulo: 'Dano', kind: 'danoMagia', magiaId: 'armaEspiritual' }, c.id)}${htmlBotao({ rotulo: 'Dano crítico', kind: 'danoMagiaCritico', magiaId: 'armaEspiritual' }, c.id)}</div></div>`;
     }
     if (c.concentracao) {
-      h += `<div class="arc-linha-fina">Concentração: <b>${esc(D.fichas.tobias.magias[c.concentracao].nome)}</b> <button data-a="sem-conc">Encerrar</button></div>`;
+      h += `<div class="arc-linha-fina">Concentração: <b>${esc(nomeMagia(c, c.concentracao))}</b> <button data-a="sem-conc">Encerrar</button></div>`;
     }
     h += `<div class="arc-abalo">Tobias foi abalado (Persuasão ou Intuição CD 16):
       <input type="text" data-a="nome-abalo" placeholder="quem conseguiu"> <button data-a="abalar">Abalado</button>
@@ -386,22 +402,32 @@
         <div class="arc-botoes">${j.botoes.map((b) => htmlBotao(b, id)).join('')}</div></div>`;
     });
     if (c.fichaId === 'tobias') h += htmlTobiasExtras(c);
-    h += htmlFicha(c);
+    if (c.fichaId === 'sussurrador') h += htmlSussurradorExtras(c);
+    if (ficha(c)) h += htmlFicha(c);
     return h + '</div>';
+  }
+
+  function htmlSussurradorExtras(c) {
+    const f = D.falas || {};
+    return `<div class="arc-abalo">
+      <button data-a="ritual-ossian" data-id="${c.id}" class="${c.ritualOssian ? 'arc-marcado' : ''}">${c.ritualOssian ? '✓ Ritual de Ossian feito' : 'Ritual de Ossian feito'}</button>
+      <div class="arc-motivo">3 raízes grossas queimadas (o musgo da Cena 4 conta como uma) + o nome dele dito em voz alta sem obedecer: perde Submergir e fica vulnerável a radiante.</div>
+      ${f.tobias ? `<div class="arc-motivo">Se falarem de Tobias ou Vaudreux: ${esc(f.tobias)}</div>` : ''}
+      ${f.dialogo ? `<div class="arc-motivo">Se tentarem dialogar: ${esc(f.dialogo)}</div>` : ''}</div>`;
   }
 
   function htmlCovil() {
     const cv = T.sugerirCovil(estado);
-    const covis = D.fichas.tobias.covil;
+    const covis = D.covis || {};
     const usados = E.covisUsados(estado);
     const feito = usados.length >= cv.quantidade;
     const pendentes = cv.sugestoes.filter((s) => !usados.includes(s.covilId));
-    return `<div class="arc-covil"><h3>Iniciativa 20 — ação de covil</h3>
+    return `<div class="arc-covil"><h3>${esc(D.tituloCovil || 'Iniciativa 20 — ação de covil')}</h3>
       <div>${cv.quantidade === 2 ? 'Fase 2: Escolha 2 diferentes.' : 'Escolha 1.'}</div>
       ${feito ? '<div class="arc-feito">✓ Ação de covil desta rodada já usada. Clique em Próximo.</div>'
         : pendentes.map((s) => `<div class="arc-jogada"><b>Sugestão: ${esc(covis[s.covilId].nome)}</b><div class="arc-motivo">${esc(s.motivo)}</div></div>`).join('')}
       <div class="arc-botoes">${cv.todas.map((id) => `<button data-rolar data-kind="covil" data-covil="${id}"${usados.includes(id) ? ' class="arc-usado" title="Já usada nesta rodada"' : ''}>${usados.includes(id) ? '✓ ' : ''}${esc(covis[id].nome)}</button>`).join('')}</div>
-      <div class="arc-motivo">Raízes que Prendem: ${esc(cv.motivos.raizesQuePrendem)}</div></div>`;
+      ${cv.motivos.raizesQuePrendem ? `<div class="arc-motivo">Raízes que Prendem: ${esc(cv.motivos.raizesQuePrendem)}</div>` : ''}</div>`;
   }
 
   function htmlLista() {
@@ -411,7 +437,7 @@
       const conds = c.condicoes || [];
       const chips = conds.map((x) => `<button data-a="tirar-cond" data-id="${id}" data-cond="${x}" class="arc-chip" title="Tirar a condição">${esc(COND[x].nome)} ×</button>`).join('');
       return `<div class="arc-linha${c.caido ? ' arc-caido' : ''}${id === atual ? ' arc-atual' : ''}">
-        <span class="arc-nome">${esc(c.nome)}${c.concentracao ? ` <small class="arc-conc">conc.: ${esc(D.fichas.tobias.magias[c.concentracao].nome)}</small>` : ''}</span>
+        <span class="arc-nome">${esc(c.nome)}${c.concentracao ? ` <small class="arc-conc">conc.: ${esc(nomeMagia(c, c.concentracao))}</small>` : ''}</span>
         <span data-pv="${id}">${htmlPv(c)}</span><span>CA ${c.ca}</span>
         <input type="text" inputmode="numeric" data-dano="${id}" placeholder="dano">
         <button data-a="aplicar-dano" data-id="${id}" title="Dano">−</button>
@@ -430,11 +456,13 @@
   function htmlCombate() {
     const atual = estado.ordem[estado.indice];
     const t = estado.combatentes.tobias;
+    const ch = chefe();
     let h = `<div class="arc-barra"><span class="arc-rodada">Rodada ${estado.rodada}</span>
       <button data-a="anterior">◀</button> <button class="arc-principal" data-a="proximo">Próximo ▶</button>
       <button data-a="recomecar">Recomeçar luta</button></div>`;
     h += htmlFeFraturada();
-    if (t && t.caido) h += `<div class="arc-queda"><b>Tobias caiu.</b> ${esc(D.textoQueda)}</div>`;
+    if (ch && ch.caido && D.textoQueda) h += `<div class="arc-queda"><b>${esc(ch.nome)} caiu.</b> ${esc(D.textoQueda)}</div>`;
+    if (!ch && D.textoFim && Object.values(estado.combatentes).every((x) => x.caido)) h += `<div class="arc-queda"><b>Luta vencida.</b> ${esc(D.textoFim)}</div>`;
     if (t && !t.caido && t.concentracao === 'imobilizarPessoa') {
       h += '<div class="arc-aviso">Imobilizar Pessoa ativo: o alvo repete a salvaguarda de Sabedoria (CD 13) no fim de cada turno dele.</div>';
     }
@@ -481,17 +509,21 @@
     if (kind === 'covil') {
       const usados = E.covisUsados(e);
       const cv = T.sugerirCovil(e);
-      const nomeCovil = D.fichas.tobias.covil[el.dataset.covil].nome;
+      const covis = D.covis || {};
+      const nomeCovil = covis[el.dataset.covil].nome;
       if (usados.includes(el.dataset.covil) && cv.quantidade === 2) {
         ui.mensagem = `Na Fase 2 as duas ações de covil têm de ser diferentes: ${nomeCovil} já foi usada nesta rodada.`;
         return render();
       }
       if (usados.length >= cv.quantidade && !globalThis.confirm(`A ação de covil desta rodada já foi usada. Rolar ${nomeCovil} mesmo assim?`)) return undefined;
       e = E.usarCovil(e, el.dataset.covil);
-      enviarMsg(C.montarCovil(D.fichas.tobias.covil[el.dataset.covil], e.combatentes.tobias.fase, o));
-      if (el.dataset.covil === 'broto' && T.sugerirCovil(e).todas.includes('broto')) {
+      const chefeAgora = E.chefeDe(e) ? e.combatentes[E.chefeDe(e)] : null;
+      enviarMsg(C.montarCovil(covis[el.dataset.covil], chefeAgora ? chefeAgora.fase : 1, o));
+      if (el.dataset.covil === 'broto' && D.fichas.raiz && T.sugerirCovil(e).todas.includes('broto')) {
         e = E.adicionarCombatente(e, D.fichas.raiz);
-        ui.mensagem = 'Uma Raiz nova brotou ao lado da raiz-mãe e entrou na lista (age logo depois do covil).';
+        ui.mensagem = D.id === 'm01c06'
+          ? 'Uma Raiz nova brotou ao lado da raiz-mãe e entrou na lista (age logo depois do covil).'
+          : 'Uma Raiz nova brotou do poço e entrou na lista (age logo depois do covil). Ponha um token de Raiz no mapa.';
       }
       return mudar(e);
     }
@@ -565,10 +597,12 @@
   }
 
   function opcoesAtuais() {
+    const chegada = raizEl.querySelector('[data-a="chegada"]');
+    const ritual = raizEl.querySelector('[data-a="ritual"]');
     return {
       jogadores: Number(raizEl.querySelector('[data-a="jogadores"]').value),
-      chegada: raizEl.querySelector('[data-a="chegada"]').value,
-      ritualCompleto: raizEl.querySelector('[data-a="ritual"]').checked,
+      chegada: chegada ? chegada.value : estado.chegada,
+      ritualCompleto: ritual ? ritual.checked : false,
     };
   }
 
@@ -584,7 +618,10 @@
         avisos.push(rr.mensagem);
       }
       if (ev.tipo === 'concentracao') {
-        avisos.push(`Teste de concentração: Constituição CD ${ev.cd} (${D.fichas.tobias.magias[ev.magiaId].nome}). Se falhar, clique em "Encerrar" no cartão de Tobias.`);
+        avisos.push(`Teste de concentração: Constituição CD ${ev.cd} (${nomeMagia(e.combatentes[ev.id], ev.magiaId)}). Se falhar, clique em "Encerrar" no cartão de Tobias.`);
+      }
+      if (ev.tipo === 'submergiu') {
+        avisos.push(`${e.combatentes[ev.id].nome} passou da metade dos PV e afunda nas raízes: fica intangível e imune a dano até o próximo turno dele e reaparece a até 6 m.`);
       }
     }
     if (avisos.length) ui.mensagem = avisos.join(' ');
@@ -745,6 +782,7 @@
         const inp = raizEl.querySelector(`input[data-dano="${el.dataset.id}"]`);
         return mudar(E.curar(estado, el.dataset.id, inp ? inp.value : ''));
       }
+      case 'ritual-ossian': return mudar(E.alternarRitualOssian(estado, el.dataset.id));
       case 'responder': return mudar(E.responder(estado, 'grupoFerido', el.dataset.valor === 'sim'));
       case 'sem-conc': return mudar(E.definirConcentracao(estado, 'tobias', null));
       case 'abalar': {
@@ -808,10 +846,15 @@
       const r = E.adicionarCondicao(estado, alvo, ev.target.value);
       if (r.estado === estado) ui.mensagem = `${estado.combatentes[alvo].nome} já está ${COND[ev.target.value].nome.toLowerCase()}.`;
       const perdeu = r.eventos.find((x) => x.tipo === 'perdeuConcentracao');
-      if (perdeu) ui.mensagem = `${r.estado.combatentes[perdeu.id].nome} perdeu a concentração em ${D.fichas.tobias.magias[perdeu.magiaId].nome} (incapacitado).`;
+      if (perdeu) ui.mensagem = `${r.estado.combatentes[perdeu.id].nome} perdeu a concentração em ${nomeMagia(r.estado.combatentes[perdeu.id], perdeu.magiaId)} (incapacitado).`;
       return mudar(r.estado);
     }
     const a = ds.a;
+    if (a === 'luta' && !estado.iniciado) {
+      usarLuta(ev.target.value);
+      ui.mensagem = '';
+      return remontar();
+    }
     if (!['jogadores', 'chegada', 'ritual'].includes(a) || estado.iniciado) return undefined;
     return remontar();
   }
@@ -922,6 +965,7 @@
     corpo.appendChild(raizEl);
     corpo.appendChild(bolhaEl);
     const salvo = await S.carregar();
+    if (salvo && salvo.combatentes && A.dados[salvo.encontroId]) usarLuta(salvo.encontroId);
     estado = salvo && salvo.encontroId === D.id && salvo.combatentes
       ? salvo
       : novoCombate({ jogadores: 5, chegada: 'preparado', ritualCompleto: false });

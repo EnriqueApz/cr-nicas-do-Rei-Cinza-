@@ -116,7 +116,9 @@ O material completo está em `mestre/herancas-do-alvorecer.md`. Os cartões dos 
    - **B, a mais ambígua:** o pai tinha feito um acordo com o culto e voltado atrás.
 3. **A raça do drow** já está decidida: drow.
 
-## 6. A extensão do Chrome: "Assistente de Combate" (versão 0.6.1)
+## 6. A extensão do Chrome: "Assistente de Combate" (versão 0.7.0)
+
+**Novo na 0.7 (28/11):** seletor "Luta" com a Missão 1 (Tobias) e as três lutas da Missão 2 (Cena 4: rãs e lodo; Cena 5: servas e raízes, com "o sussurro"; Cena 6: O Sussurrador, com covil Broto/Voz querida, Submergir nas Raízes e o botão do ritual de Ossian). Dados em `src/dados/m02-sussurro.js`. Testes: 78 de regras + 9 de tela da Missão 2. A extensão instalada no Chrome do mestre fica em `Área de TrabalhoAssistente de Combate` (já atualizada para 0.7; falta clicar em recarregar em chrome://extensions).
 
 Pasta: `extensao/`. O guia de uso para o mestre está em `extensao/LEIA-ME.md`. O pacote é `assistente-de-combate.zip`, na raiz do repositório, gerado por `extensao/empacotar.sh`.
 
@@ -203,10 +205,16 @@ Se algo falhar, peça ao mestre o texto de **"Copiar diagnóstico"**. Ele mostra
   - `ferramentas/site/`: o site;
   - `docs/superpowers/`: o design e o plano da extensão.
 
+## 9b. A Missão 2 já está montada no Roll20 (28/11)
+
+- 4 páginas novas com mapa, 47 tokens e 16 fichas (etiqueta "Missão 2"), no mesmo jogo da Missão 1. Detalhes em `mestre/missao2-roll20.md`.
+- Tokens novos (Gemini) em `Cronicas Rei CinzaTokensMissao 02 - O Segundo Sussurro`, no PC do mestre.
+- Lição técnica: as fichas são da ficha D&D 2024 (dados no atributo `store`). Criar ficha por código funciona clonando a estrutura de uma ficha existente. Ao abrir uma ficha, o `custom_meta1` muda de `ac.current` para `ac.total`: nunca mande valor `undefined` para um token (o Roll20 descarta o token em silêncio).
+
 ## 10. Próximos passos sugeridos
 
 **Antes de sábado (o mestre testa):**
-1. Instalar a extensão 0.6.1 no Chrome.
+1. Instalar a extensão (hoje 0.7.0) no Chrome.
 2. Testar no Roll20:
    - rolagens sussurradas, sem faixa vermelha;
    - 🔗 com a ficha;

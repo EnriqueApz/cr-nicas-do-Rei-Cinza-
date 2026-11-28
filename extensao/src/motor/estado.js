@@ -27,7 +27,7 @@
     for (const m of lista) {
       const f = encontro.fichas[m.fichaId];
       contagem[m.fichaId] = (contagem[m.fichaId] || 0) + 1;
-      const unico = m.fichaId === 'tobias';
+      const unico = m.fichaId === 'tobias' || !!f.unico;
       const id = unico ? m.fichaId : `${m.fichaId}-${contagem[m.fichaId]}`;
       const pv = jogadores === 5 && f.pv5 ? f.pv5 : f.pv;
       combatentes[id] = {
@@ -42,7 +42,7 @@
         iniciativa: null,
         espacos: f.espacos ? copiar(f.espacos) : null,
         concentracao: null,
-        usos: f.feFraturada ? { feFraturada: 1 } : {},
+        usos: f.feFraturada ? { feFraturada: 1 } : (m.fichaId === 'sussurrador' ? { submergir: 1 } : {}),
         fase: 1,
         reacao: true,
         desvantagemProximoAtaque: false,
@@ -67,6 +67,8 @@
     if (t && ritualCompleto) t.pvTemp = 15;
     return {
       encontroId: encontro.id,
+      chefeId: encontro.chefe !== undefined ? encontro.chefe : (combatentes.tobias ? 'tobias' : null),
+      covil: encontro.covil !== undefined ? !!encontro.covil : !!combatentes.tobias,
       jogadores,
       chegada,
       ritualCompleto,
@@ -91,8 +93,23 @@
     return e;
   }
 
+  // O chefe da luta (o que tem covil e não sai da lista). Estados antigos não têm chefeId: é Tobias.
+  function chefeDe(estado) {
+    if (estado.chefeId !== undefined) return estado.chefeId;
+    return estado.combatentes.tobias ? 'tobias' : null;
+  }
+
   function temCovil(estado) {
-    return !!estado.combatentes.tobias;
+    return estado.covil !== undefined ? !!estado.covil : !!estado.combatentes.tobias;
+  }
+
+  // O covil ainda age: a luta tem covil e o chefe (se houver) está de pé.
+  function covilAtivo(estado) {
+    if (!temCovil(estado)) return false;
+    const id = chefeDe(estado);
+    if (!id) return true;
+    const c = estado.combatentes[id];
+    return !!c && !c.caido;
   }
 
   function iniciar(estado) {
@@ -116,7 +133,7 @@
   }
 
   function invalido(e, id) {
-    if (id === 'covil') return !e.combatentes.tobias || e.combatentes.tobias.caido;
+    if (id === 'covil') return !covilAtivo(e);
     return e.combatentes[id].caido;
   }
 
@@ -176,6 +193,7 @@
   }
 
   function limiarDe(estado, c) {
+    if (c.fichaId === 'sussurrador') return Math.ceil(c.pvMax / 2);
     if (c.fichaId !== 'tobias') return null;
     // Metade do PV normal dele (sem o Auxílio): 125 → 63, 105 → 53.
     const bonus = c.bonusPv ?? (estado.chegada === 'preparado' ? 5 : 0);
@@ -195,6 +213,11 @@
     resto -= absorvido;
     c.pv = Math.max(0, c.pv - resto);
     const limiar = limiarDe(e, c);
+    // O Sussurrador afunda nas raízes uma vez ao passar da metade (o ritual de Ossian tira isso).
+    if (limiar !== null && c.fichaId === 'sussurrador' && c.usos.submergir === 1 && !c.ritualOssian && antes >= limiar && c.pv < limiar && c.pv > 0) {
+      c.usos.submergir = 0;
+      eventos.push({ tipo: 'submergiu', id });
+    }
     if (limiar !== null && c.usos.feFraturada === 1 && !c.pendenteFeFraturada && antes >= limiar && c.pv < limiar) {
       c.pendenteFeFraturada = true;
       eventos.push({ tipo: 'limiarFeFraturada', id });
@@ -268,7 +291,7 @@
 
   // Tira um inimigo da luta (só na preparação; Tobias não sai).
   function removerCombatente(estado, id) {
-    if (estado.iniciado || id === 'tobias' || !estado.combatentes[id]) return estado;
+    if (estado.iniciado || id === 'tobias' || id === chefeDe(estado) || !estado.combatentes[id]) return estado;
     const e = copiar(estado);
     delete e.combatentes[id];
     return e;
@@ -361,6 +384,15 @@
     return e;
   }
 
+  // Ritual de Ossian feito (Missão 2): o Sussurrador perde Submergir e fica vulnerável a radiante.
+  function alternarRitualOssian(estado, id) {
+    const c = estado.combatentes[id];
+    if (!c) return estado;
+    const e = copiar(estado);
+    e.combatentes[id].ritualOssian = !c.ritualOssian;
+    return e;
+  }
+
   function responder(estado, chave, valor) {
     const e = copiar(estado);
     e.perguntas[chave] = valor;
@@ -378,6 +410,7 @@
     aplicarDano, curar, gastarEspaco, adicionarCombatente, removerCombatente, definirConcentracao, marcarAbalado,
     consumirDesvantagem, responder, alternarSussurro, numeroValido, copiar,
     sincronizar, aplicarFicha, adicionarDoMapa, adicionarCondicao, removerCondicao, atacaComDesvantagem, covisUsados, usarCovil,
+    chefeDe, temCovil, covilAtivo, alternarRitualOssian,
   };
   globalThis.AssistenteRC = globalThis.AssistenteRC || {};
   globalThis.AssistenteRC.estado = api;

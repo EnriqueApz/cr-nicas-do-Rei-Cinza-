@@ -14,7 +14,8 @@ Campanha de D&D 5e (regras de 2024) mestrada no Roll20. Este repositório guarda
 
 - `mestre/herancas-do-alvorecer.md`: o material do mestre (heranças, calendário de cada personagem, o drow, o mapa e o apito).
 - `jogadores/herancas-do-alvorecer.md`: os cartões para os jogadores, entregues só depois de aceitarem a herança.
-- `extensao/`: a extensão "Assistente de Combate" (versão 0.6.1). Para testar, rode `npm run tudo` dentro de `extensao/`. O guia de uso está em `extensao/LEIA-ME.md`.
+- `extensao/`: a extensão "Assistente de Combate" (versão 0.7.0). Para testar, rode `npm run tudo` dentro de `extensao/`. O guia de uso está em `extensao/LEIA-ME.md`.
+- `mestre/missao2-roll20.md`: o que já está montado no Roll20 para a Missão 2 (páginas, tokens, fichas).
 - `ferramentas/site/`: o site do mestre (https://claude.ai/artifact/3xdodd6t57cqEszUnB7Y2L). Como remontar: `ferramentas/site/LEIA-ME.md`.
 - A bíblia em PDF **não** está no repositório: fica no PC do mestre, na pasta "Cronicas Rei Cinza".
 

@@ -4,6 +4,11 @@
   const dados = (typeof module !== 'undefined')
     ? require('../dados/m01c06-tobias.js')
     : raiz.dados.m01c06;
+  const REGISTRO = (typeof module !== 'undefined')
+    ? { m01c06: dados, ...require('../dados/m02-sussurro.js') }
+    : raiz.dados;
+  // Os dados da luta do estado (estados antigos, sem encontroId conhecido, são a luta do Tobias).
+  const dadosDe = (e) => (e && REGISTRO[e.encontroId]) || dados;
   const copiar = (o) => JSON.parse(JSON.stringify(o));
   const fichaTobias = dados.fichas.tobias;
 
@@ -106,9 +111,65 @@
     lobo: { acaoId: 'mordida', aviso: 'Derrube a linha de frente para os cultistas atacarem com vantagem.' },
   };
 
+  // Botões de uma habilidade que não é ataque (salvaguarda): rola o quadro e, se tiver, o dano.
+  const botaoHabilidade = (m, magiaId) => {
+    const b = [{ rotulo: m.nome, kind: 'magia', magiaId }];
+    if (m.dano) b.push({ rotulo: `Dano (${m.nome})`, kind: 'danoMagia', magiaId });
+    return b;
+  };
+
+  // Missão 2: capangas com jogadas próprias.
+  function sugerirCapangaM2(estado, c, D) {
+    const f = D.fichas[c.fichaId];
+    const aviso = (D.avisos || {})[c.fichaId];
+    const avisos = aviso ? [aviso] : [];
+    const jogadas = [];
+    if (c.fichaId === 'ra') {
+      jogadas.push({ titulo: 'Mordida (e agarra)', motivo: 'Quem estiver na beira da água ou sozinho. Acertou: o alvo fica Agarrado (CD 12).', botoes: botoesAtaque('mordida') });
+      jogadas.push({ titulo: 'Engolir quem já está agarrado', motivo: 'Se já agarrou alguém: engula e salte de volta para a água. Se a rã sofrer 10 de dano num turno, cospe.', botoes: botaoHabilidade(f.magias.engolir, 'engolir') });
+    } else if (c.fichaId === 'lodo') {
+      if (c.pv < c.pvMax / 2) avisos.push('Abaixo da metade dos PV: o dano do Cobrir cai pela metade.');
+      jogadas.push({ titulo: 'Cobrir', motivo: 'Entre no espaço de quem está caído ou acabou de ser cuspido; quem falha não pode falar (sem magias verbais).', botoes: botaoHabilidade(f.magias.cobrir, 'cobrir') });
+    } else if (c.fichaId === 'serva') {
+      jogadas.push({ titulo: 'Ataques Múltiplos: Prender + Golpe de Galho', motivo: 'Prenda primeiro (Agarrado e Impedido, CD 13) e bata no mesmo alvo. Alcance 3 m.',
+        botoes: [{ rotulo: 'Ataque (Prender)', kind: 'ataque', acaoId: 'prender' }, ...botoesAtaque('galho')] });
+    } else if (c.fichaId === 'raiz') {
+      const a = f.acoes.chicote;
+      jogadas.push({ titulo: a.nome, motivo: a.extra, botoes: botoesAtaque('chicote') });
+    }
+    return { avisos, jogadas };
+  }
+
+  function sugerirSussurrador(estado, c, D) {
+    const avisos = [];
+    if (c.ritualOssian) avisos.push('Ritual de Ossian feito: sem Submergir nas Raízes e vulnerável a radiante (dano dobrado).');
+    else if (c.usos && c.usos.submergir === 0) avisos.push('Já usou Submergir nas Raízes.');
+    avisos.push('Reação: Canto da Saudade em quem se afastar dele (Sabedoria CD 13 ou para no lugar).');
+    const res = { avisos, jogadas: [] };
+    if (estado.rodada === 1) res.fala = D.falas.rodada1;
+    const f = D.fichas.sussurrador;
+    res.jogadas.push({
+      titulo: 'Convocar Raízes (se a recarga der 5 ou 6)',
+      motivo: 'O botão rola a recarga (1d6). Com 5 ou 6: círculo de 3 m onde houver mais gente junta; ele prefere prender a matar.',
+      botoes: botaoHabilidade(f.magias.convocar, 'convocar'),
+    });
+    res.jogadas.push({
+      titulo: '2× Ataque de Raiz',
+      motivo: 'Em quem estiver queimando uma raiz grossa ou tentando fugir. Alcance 6 m.',
+      botoes: botoesAtaque('raiz'),
+    });
+    return res;
+  }
+
   function sugerir(estado, id) {
     const c = estado.combatentes[id];
     if (!c) return { avisos: [], jogadas: [] };
+    const D = dadosDe(estado);
+    if (D !== dados) {
+      if (c.fichaId === 'sussurrador') return sugerirSussurrador(estado, c, D);
+      if (D.fichas[c.fichaId]) return sugerirCapangaM2(estado, c, D);
+      return { avisos: [], jogadas: [] };
+    }
     if (c.fichaId === 'tobias') return sugerirTobias(estado);
     const cfg = capangas[c.fichaId];
     if (!cfg) return { avisos: [], jogadas: [] };
@@ -119,7 +180,26 @@
     };
   }
 
+  function sugerirCovilM2(estado, D) {
+    if (D.id === 'm02c05') {
+      const motivos = { sussurro: 'Escolha um personagem que ainda não ouviu a voz (cada um só uma vez). É atmosfera, não castigo.' };
+      return { quantidade: 1, sugestoes: [{ covilId: 'sussurro', motivo: motivos.sussurro }], todas: ['sussurro'], motivos };
+    }
+    const raizesDePe = Object.values(estado.combatentes).filter((c) => c.fichaId === 'raiz' && !c.caido).length;
+    const max = D.maxRaizes ? D.maxRaizes(estado.jogadores) : 6;
+    const podeBroto = raizesDePe < max;
+    const motivos = {
+      broto: estado.rodada <= 2 ? 'Rodadas 1 e 2: chame as raízes extras.' : `Só ${raizesDePe} Raiz(es) de pé: mais uma para agarrar.`,
+      vozQuerida: 'No conjurador ou em quem cura: tira a ação bônus e a reação.',
+    };
+    const primeiro = podeBroto && (estado.rodada <= 2 || raizesDePe < 3) ? 'broto' : 'vozQuerida';
+    const todas = podeBroto ? ['broto', 'vozQuerida'] : ['vozQuerida'];
+    return { quantidade: 1, sugestoes: [{ covilId: primeiro, motivo: motivos[primeiro] }], todas, motivos };
+  }
+
   function sugerirCovil(estado) {
+    const D = dadosDe(estado);
+    if (D !== dados) return sugerirCovilM2(estado, D);
     const t = estado.combatentes.tobias;
     const quantidade = t && t.fase === 2 ? 2 : 1;
     const raizesDePe = Object.values(estado.combatentes).filter((c) => c.fichaId === 'raiz' && !c.caido).length;
@@ -165,7 +245,7 @@
     return { estado: e, mensagem, precisaRolarCura, caiu };
   }
 
-  const api = { sugerir, sugerirCovil, resolverFeFraturada };
+  const api = { sugerir, sugerirCovil, resolverFeFraturada, dadosDe };
   globalThis.AssistenteRC = globalThis.AssistenteRC || {};
   globalThis.AssistenteRC.taticas = api;
   if (typeof module !== 'undefined') module.exports = api;

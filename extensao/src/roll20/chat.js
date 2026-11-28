@@ -30,6 +30,7 @@
         ? ` {{Ataque=[[2d20kl1+${magia.ataque}]] (desvantagem)}}`
         : ` {{Ataque=[[1d20+${magia.ataque}]]}}`;
     }
+    if (magia.recarga) msg += ' {{Recarga=[[1d6]] (5 ou 6: pode usar)}}';
     if (magia.cd) msg += ` {{CD=${magia.cd}}}`;
     if (magia.cura) msg += ` {{Cura=[[${magia.cura}]]}}`;
     msg += ` {{Efeito=${magia.efeito}}}`;
