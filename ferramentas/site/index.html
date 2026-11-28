@@ -220,6 +220,26 @@ body.narrar .conteudo .mesa :is(h3) { opacity: .22; }
 body.narrar .conteudo .ler { box-shadow: 0 0 0 3px var(--ler); }
 body.narrar .cena.feita > :not(.cena-topo):not(.seguir) { opacity: 1; }
 
+/* modo foco */
+[hidden] { display: none !important; }
+.btn-foco { border: 2px solid var(--ato); background: var(--papel); color: var(--ato); border-radius: 999px; padding: 6px 14px; font: 800 13px var(--fonte-ui); cursor: pointer; }
+.btn-foco[aria-pressed="true"] { background: var(--ato); color: #fff; }
+body.foco .menu, body.foco .lado { display: none; }
+body.foco .grade { grid-template-columns: minmax(0, 900px); justify-content: center; }
+body.foco .cena { border-top: 0; margin-top: 0; padding-top: 0; }
+body.foco .cena .seguir { display: none; }
+body.foco .folha { padding-bottom: 100px; min-height: 55vh; }
+.barra-foco { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 14px); z-index: 25; display: flex; align-items: center; gap: 8px;
+  width: min(780px, calc(100% - 24px)); background: var(--papel); border: 1px solid var(--linha); border-radius: 999px; box-shadow: var(--sombra); padding: 7px; font-family: var(--fonte-ui); }
+.barra-foco .onde { flex: 1; min-width: 0; text-align: center; line-height: 1.2; }
+.barra-foco small { display: block; font: 800 11px var(--fonte-ui); letter-spacing: .1em; text-transform: uppercase; color: var(--tinta-suave); }
+.barra-foco b { display: block; font: 800 15px var(--fonte-ui); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.barra-foco button { border: 0; border-radius: 999px; padding: 10px 15px; font: 800 14px var(--fonte-ui); cursor: pointer; background: var(--papel-2); color: var(--tinta); white-space: nowrap; }
+.barra-foco button.forte { background: var(--ato); color: #fff; }
+.barra-foco button.ok { background: color-mix(in srgb, var(--ato) 20%, transparent); color: var(--ato); }
+.barra-foco button:disabled { opacity: .35; cursor: default; }
+@media (max-width: 520px) { .barra-foco button { padding: 10px 11px; } .barra-foco b { font-size: 13px; } }
+
 /* festa */
 .festa { position: fixed; inset: 0; pointer-events: none; z-index: 50; overflow: hidden; }
 .festa i { position: absolute; top: 40%; left: 50%; width: 10px; height: 14px; border-radius: 2px; animation: voa 1.3s cubic-bezier(.15, .7, .3, 1) forwards; }
@@ -337,7 +357,7 @@ body.narrar .cena.feita > :not(.cena-topo):not(.seguir) { opacity: 1; }
         const seg = document.createElement('div');
         seg.className = 'seguir';
         seg.innerHTML = `<button type="button">Próxima: ${esc(secoes[i + 1].querySelector('h2').textContent)} →</button>`;
-        seg.querySelector('button').addEventListener('click', () => secoes[i + 1].scrollIntoView({ behavior: reduzir ? 'auto' : 'smooth', block: 'start' }));
+        seg.querySelector('button').addEventListener('click', () => irParaCena(secoes[i + 1].id));
         s.appendChild(seg);
       }
     });
@@ -362,6 +382,7 @@ body.narrar .cena.feita > :not(.cena-topo):not(.seguir) { opacity: 1; }
       festejar(null);
     }
     montarMenu(p.id);
+    if (foco) aplicarFoco(true);
   }
 
   function atualizarProgresso(p) {
@@ -420,8 +441,94 @@ body.narrar .cena.feita > :not(.cena-topo):not(.seguir) { opacity: 1; }
     conteudo.prepend(titulo);
   }
 
-  const LEGENDA = `<div class="legenda"><span><i style="background:var(--ler)"></i>Ler em voz alta</span><span><i style="background:var(--fala)"></i>Fala de personagem</span><span><i style="background:var(--mestre)"></i>Para o mestre</span><span><i style="background:var(--ouro-forte)"></i>Sua mesa</span><button type="button" class="btn-narrar" id="btn-narrar" aria-pressed="false">🎙 Modo narração</button></div>`;
+  const LEGENDA = `<div class="legenda"><span><i style="background:var(--ler)"></i>Ler em voz alta</span><span><i style="background:var(--fala)"></i>Fala de personagem</span><span><i style="background:var(--mestre)"></i>Para o mestre</span><span><i style="background:var(--ouro-forte)"></i>Sua mesa</span><button type="button" class="btn-narrar" id="btn-narrar" aria-pressed="false">🎙 Modo narração</button><button type="button" class="btn-foco" id="btn-foco" aria-pressed="false">🎯 Modo foco</button></div>`;
   let narrando = ler('cronicas-narrar', false);
+  let foco = ler('cronicas-foco', false);
+  let passos = [], passo = 0, paginaFoco = null;
+
+  // Vai para uma cena: no modo foco troca a cena mostrada; fora dele, rola até ela.
+  function irParaCena(id) {
+    if (foco && passos.length) {
+      const i = passos.findIndex((s) => s.id === id);
+      if (i >= 0) { passo = i; aplicarFoco(); return; }
+    }
+    const el = $(id);
+    if (el) el.scrollIntoView({ behavior: reduzir ? 'auto' : 'smooth', block: 'start' });
+  }
+
+  function prepararFoco(p, conteudo, secoes) {
+    paginaFoco = p;
+    const intro = document.createElement('section');
+    intro.className = 'cena cena-intro';
+    intro.id = 'cena-abertura';
+    const primeira = secoes[0];
+    while (conteudo.firstChild && conteudo.firstChild !== primeira) intro.appendChild(conteudo.firstChild);
+    if (intro.textContent.trim()) {
+      conteudo.prepend(intro);
+      passos = [intro, ...secoes];
+      const pul = $('pulos');
+      if (pul) pul.insertAdjacentHTML('afterbegin', '<button type="button" data-ir="cena-abertura">★ Abertura</button>');
+    } else {
+      passos = [...secoes];
+    }
+    passo = Math.min(ler('cronicas-passo', {})[p.id] || 0, passos.length - 1);
+    const barra = document.createElement('div');
+    barra.className = 'barra-foco';
+    barra.id = 'barra-foco';
+    barra.innerHTML = '<button type="button" data-f="ant" aria-label="Cena anterior">◀</button><div class="onde"><small></small><b></b></div><button type="button" data-f="feita">✓ Feita</button><button type="button" data-f="prox" class="forte">Próxima ▶</button>';
+    leitura.appendChild(barra);
+    barra.addEventListener('click', (ev) => {
+      const b = ev.target.closest('[data-f]');
+      if (!b || b.disabled) return;
+      if (b.dataset.f === 'ant' && passo > 0) passo -= 1;
+      else if (b.dataset.f === 'prox' && passo < passos.length - 1) passo += 1;
+      else if (b.dataset.f === 'feita') {
+        const ch = passos[passo].querySelector('.check');
+        if (ch && ch.getAttribute('aria-pressed') !== 'true') ch.click();
+        if (passo < passos.length - 1) passo += 1;
+      }
+      aplicarFoco();
+    });
+    $('btn-foco').addEventListener('click', () => { foco = !foco; guardar('cronicas-foco', foco); aplicarFoco(true); });
+    aplicarFoco(true);
+  }
+
+  function aplicarFoco(inicio) {
+    const ativo = !!foco && !!paginaFoco;
+    document.body.classList.toggle('foco', ativo);
+    const bf = $('btn-foco');
+    if (bf) bf.setAttribute('aria-pressed', String(!!foco));
+    passos.forEach((s, i) => { s.hidden = ativo && i !== passo; });
+    const barra = $('barra-foco');
+    if (!barra) return;
+    barra.hidden = !ativo;
+    if (!ativo) return;
+    const s = passos[passo];
+    const h = s.querySelector('h2');
+    barra.querySelector('small').textContent = `${passo + 1} de ${passos.length}`;
+    barra.querySelector('b').textContent = h ? h.textContent : 'Abertura da missão';
+    barra.querySelector('[data-f="ant"]').disabled = passo === 0;
+    barra.querySelector('[data-f="prox"]').disabled = passo === passos.length - 1;
+    const ch = s.querySelector('.check');
+    const fb = barra.querySelector('[data-f="feita"]');
+    fb.hidden = !ch;
+    if (ch) fb.classList.toggle('ok', ch.getAttribute('aria-pressed') === 'true');
+    const m = ler('cronicas-passo', {});
+    m[paginaFoco.id] = passo;
+    guardar('cronicas-passo', m);
+    const pul = $('pulos');
+    if (pul) pul.querySelectorAll('button').forEach((b) => { const sim = b.dataset.ir === s.id; b.classList.toggle('aqui', sim); if (sim) b.scrollIntoView({ inline: 'center', block: 'nearest' }); });
+    if (!inicio) {
+      const topo = leitura.querySelector('.folha').getBoundingClientRect().top + window.scrollY - 130;
+      window.scrollTo({ top: Math.max(0, topo), behavior: 'auto' });
+    }
+  }
+
+  document.addEventListener('keydown', (ev) => {
+    if (!foco || !paginaFoco || ev.target.matches('input, textarea, select') || ev.altKey || ev.ctrlKey || ev.metaKey) return;
+    if (ev.key === 'ArrowRight' && passo < passos.length - 1) { passo += 1; aplicarFoco(); }
+    if (ev.key === 'ArrowLeft' && passo > 0) { passo -= 1; aplicarFoco(); }
+  });
 
   // Marca como fala todo trecho entre aspas que parece dito por alguém (frase com pontuação ou 4+ palavras).
   function marcarFalas(raiz) {
@@ -484,7 +591,7 @@ body.narrar .cena.feita > :not(.cena-topo):not(.seguir) { opacity: 1; }
       alvos = emCenas(conteudo, p);
       const curto = (t) => t.replace(/^(Cena \d+)\s*—\s*.*$/, '$1').replace(/^Prólogo\s*—.*$/, 'Prólogo').slice(0, 28);
       $('pulos').innerHTML = alvos.map((s) => `<button type="button" data-ir="${s.id}">${esc(curto(s.querySelector('h2').textContent))}</button>`).join('');
-      $('pulos').addEventListener('click', (ev) => { const b = ev.target.closest('[data-ir]'); if (b) $(b.dataset.ir).scrollIntoView({ behavior: reduzir ? 'auto' : 'smooth', block: 'start' }); });
+      $('pulos').addEventListener('click', (ev) => { const b = ev.target.closest('[data-ir]'); if (b) irParaCena(b.dataset.ir); });
     } else {
       alvos = [...conteudo.querySelectorAll('h2[id]')];
     }
@@ -492,14 +599,16 @@ body.narrar .cena.feita > :not(.cena-topo):not(.seguir) { opacity: 1; }
       const h = s.tagName === 'H2' ? s : s.querySelector('h2');
       return `<a href="#${p.id}" data-ir="${s.id}">${esc(h.textContent)}</a>`;
     }).join('') : '';
-    if (p.num) atualizarProgresso(p);
+    paginaFoco = null;
+    passos = [];
+    if (p.num) { atualizarProgresso(p); prepararFoco(p, conteudo, alvos); } else document.body.classList.remove('foco');
     if (p.id === 'resumo') prepararOuvir();
     // destaca a cena que está na tela
     if (observador) observador.disconnect();
     if ('IntersectionObserver' in window && alvos.length) {
       observador = new IntersectionObserver((entradas) => {
         entradas.forEach((e) => {
-          if (!e.isIntersecting) return;
+          if (!e.isIntersecting || document.body.classList.contains('foco')) return;
           const idv = e.target.id;
           lado.querySelectorAll('a[data-ir]').forEach((a) => a.classList.toggle('aqui', a.dataset.ir === idv));
           const pulos = $('pulos');
@@ -517,8 +626,7 @@ body.narrar .cena.feita > :not(.cena-topo):not(.seguir) { opacity: 1; }
     const a = ev.target.closest('a[data-ir]');
     if (!a) return;
     ev.preventDefault();
-    const el = $(a.dataset.ir);
-    if (el) el.scrollIntoView({ behavior: reduzir ? 'auto' : 'smooth', block: 'start' });
+    irParaCena(a.dataset.ir);
   });
   $('btn-menu').addEventListener('click', () => {
     const aberto = document.body.classList.toggle('menu-aberto');
