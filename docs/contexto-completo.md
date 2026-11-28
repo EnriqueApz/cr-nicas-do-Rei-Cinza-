@@ -43,7 +43,7 @@ Resumo de tudo o que foi conversado e feito numa conversa com o Claude na nuvem 
 
 - **A sessão 3 é no sábado, 29/11/2026:** a luta contra **Tobias** (Missão 1, Cena 6). Depois, no máximo, a ida até a segunda cidade (início da Missão 2).
 - O grupo salvou Mira, que continua desacordada, e voltou para Vaudreux. Ainda não enfrentou o clérigo Tobias.
-- **Tobias está preparado:** um cultista fugiu na cena anterior e avisou. Com 5 jogadores, Tobias tem 125 PV, mais 5 do Auxílio.
+- **Tobias está preparado:** na sessão 2 (Cena 4), o grupo nocauteou um cultista, mas ele acordou, fugiu e avisou Tobias. Com 5 jogadores, Tobias tem 125 PV, mais 5 do Auxílio.
 - **O mestre mudou o encontro:** tirou 2 dos 4 cultistas e pôs 2 lobos.
 - No Roll20, os tokens se chamam "Cultista da Raiz 1/2", "Dire Wolf 1/2" e "Raiz Sanguinolenta 1 a 4".
 
@@ -99,7 +99,7 @@ O material completo está em `mestre/herancas-do-alvorecer.md`. Os cartões dos 
   - a descrição completa e um prompt de imagem para o Gemini estão no material das heranças.
 - **A entrada do drow na sessão 3:**
   - o grupo chega com Mira desacordada e o encontra na sombra, vigiando a casa de Ysolde;
-  - ele seguiu o rastro do cultista que fugiu e leva o grupo até Tobias (o que também explica Tobias estar preparado);
+  - ele seguiu o rastro do cultista que fugiu do grupo depois de ser nocauteado (Cena 4) e leva o grupo até Tobias (o que também explica Tobias estar preparado);
   - Ysolde não sabe quem matou o marido;
   - depois da luta, deixe o drow ler primeiro a página do diário de Tobias sobre o pai de Mira.
 - **Ajustes no texto da bíblia:**
