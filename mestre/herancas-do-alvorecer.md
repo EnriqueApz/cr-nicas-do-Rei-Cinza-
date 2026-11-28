@@ -56,7 +56,7 @@ A campanha já começou, então ninguém recebe a herança pronta. Cada personag
 | Mago gnomo conjurador | A Pena | 1 | 4 | 4 | 5 ou 6 |
 | Autognomo guerreiro rúnico | A Forja | 1 | 3 | 8 | 10 |
 | Véspero (bruxo, Undead Patron) | O Outro Lado | 1 | 5 | 7 | 11 |
-| Quinto personagem (Maurício, patrulheiro) | A Vigia | 1 ou 2 | 5 | 6 | 9 |
+| Drow do Maurício (patrulheiro Gloom Stalker) | A Vigia, por escolha | 1 | 5 | 6 | 9 |
 
 Os números são as missões. A ordem foi pensada para começar pelo clérigo, que é o mais fácil, e terminar pelo Véspero, que é o mais pesado.
 
@@ -104,31 +104,33 @@ O Véspero é Reborn: não dorme nem sonha. Faz o descanso longo em 4 horas, par
 - **Escolha (Missão 11):** na Terra Cinzenta, a ama aparece em pessoa e pede: "Proteja o menino." Se o Véspero cantarolar a canção de ninar, Mael para de fugir e chega perto: "Só a minha ama sabia essa música." Aceitar é proteger Mael, o que abre caminho para o Final A.
 - Ele não tem verso, porque a família dele nunca jurou nada. Se proteger Mael, no Trono Cinzento a ama ensina a ele a canção de ninar. Ela funciona como o soldadinho de Vorn: o rei perde o primeiro turno. Os dois efeitos não se somam.
 
-### O quinto personagem: o patrulheiro do Maurício — A Vigia
+### O quinto personagem: o drow do Maurício — A Vigia, por escolha
 
-O Maurício vai jogar de **patrulheiro Gloom Stalker** (Andarilho das Trevas); a raça ainda está em aberto. A história dele é "Eu trouxe a peste": há 10 anos, como carroceiro, levou caixas lacradas de Brumafria para um homem de cinza sem nome. A febre cinzenta que veio depois matou o pai de Mira. Ele tem manchas cinzentas na pele e é o benfeitor anônimo que manda dinheiro e brinquedos de madeira para Mira e Ysolde. Os jogadores não sabem da Peste Cinza; ele só sabe da parte dele.
+**A história do jogador:** elfo drow, patrulheiro Gloom Stalker arqueiro, caçador de feras. Fugiu das cavernas e chegou à cidade por acaso. Viu maldade no pai de Mira, fez um julgamento ruim e o matou. Arrependido, ficou na região para garantir a segurança da família. Sabe da situação da cidade e de que Mira é a única criança dela. Decidiu ficar, ajudar e investigar.
 
-- **Subclasse: Gloom Stalker.** O homem que se esconde: Disfarçar-se é o rosto que ele usa para deixar a trouxa na porta de Ysolde. Lembre que a Visão Umbral o deixa invisível, na escuridão, para quem enxerga no escuro (os lobos, os mortos-vivos, as criaturas da Terra Cinzenta).
-- **Raça sugerida:** anão (a Resiliência Anã explica ter sobrevivido à febre), humano, halfling (entalha os brinquedos) ou orc.
-- **O objeto:** o mapa de couro com as seis marcas e o "?" é do avô dele. Ele usava o mapa para traçar rotas e nunca entendeu as marcas. O apito de osso estava junto, na mesma bolsa.
-- **A virada:** o homem de cinza não o contratou por acaso. Foi atrás dele por causa do mapa: o herdeiro da Vigia, usado como isca, como os outros. Até a culpa dele foi armada.
+**Ele não é herdeiro de sangue.** É a peça que Ossian não planejou: os fragmentos correm para o sangue da Ordem, e ele não tem esse sangue. A herança dele é a que ele escolhe, e isso combina com a história de alguém que quer se redimir.
+
+- **O objeto:** nas cavernas, ele achou o corpo de um batedor humano muito antigo, com um mapa de couro de seis marcas e um "?", e um apito de osso que não faz som. Levou os dois sem saber por quê. Era o último da Vigia.
+- **A maldade que ele viu (decida antes de revelar):**
+  - **Opção A, a mais dura:** o pai era inocente. O que ele viu foi a marca que o culto de Tobias deixou no homem que se recusou a entregar Mira. Ele matou quem a protegia.
+  - **Opção B, a mais ambígua:** o pai tinha mesmo feito um acordo com o culto, mas tinha voltado atrás. O julgamento não foi totalmente errado, mas veio tarde e com a mão pesada.
+  - Em qualquer opção, a resposta está no diário de Tobias. Deixe o drow ler essa página primeiro.
 
 | Etapa | Missão | O que acontece |
 |---|---|---|
-| Sinal | 1 ou 2 | Na manhã depois da queda de Tobias, uma das seis marcas do mapa está escura, como se riscada. Descreva e não explique. |
-| Pista | 5 | O mapa que Ossian dá é uma cópia do mapa da família (mesmo rasgo, mesma mancha). Se ele escrever à família, a resposta chega na Missão 6. |
-| Revelação | 6 | No antídoto da Peste Cinza, a "Oração dos Doentes" descreve as mesmas manchas da pele dele. A carta da família conta que o avô vigiava esses lugares. Ele entende que a febre de 10 anos atrás era um eco da Peste Cinza e que as caixas eram parte disso. É a cena de destaque dele. |
-| Escolha | 9 | No cerco, tocar o apito é assumir a ronda: os Cavaleiros Caídos aparecem (se a Missão 5 terminou bem). Aceitar é ganhar o Dom e o verso. Também é a redenção: Edda toma o juramento de quem quer recomeçar. |
+| Sinal | Depois que Tobias cair | Na manhã seguinte, uma das seis marcas do mapa está escura, como se tivesse sido riscada. Descreva e não explique. |
+| Pista | 5 | O mapa que Ossian dá é uma cópia do mapa do batedor (mesmo rasgo, mesma mancha). |
+| Revelação | 6 | O apito toca pela primeira vez. Só ele ouve, e o fantasma do batedor aparece para ele: "Você terminou a minha ronda até aqui. Quer ir até o fim?" É a cena de destaque dele. |
+| Escolha | 9 | No cerco, tocar o apito é assumir a ronda: os Cavaleiros Caídos aparecem (se a Missão 5 terminou bem). Aceitar é ganhar o Dom e o verso, e Edda toma o juramento de quem quer recomeçar. |
+
+- **Na Missão 7:** Ossian não conta com ele. O drow é o único em quem o Relicário "não pega": os fragmentos não correm para ele. Pode ser a primeira pista de que o grupo era isca.
+- **Gloom Stalker:** lembre que a Visão Umbral o deixa invisível, na escuridão, para quem enxerga no escuro (os lobos, os mortos-vivos, as criaturas da Terra Cinzenta).
 
 **A entrada dele (sessão 3, antes da luta com Tobias):**
 
-1. **Pego no flagra.** Anoitecendo, o grupo chega com Mira desacordada e encontra um estranho na porta de Ysolde, deixando uma trouxa com moedas e um brinquedo de madeira. O Maurício decide se mente ou se fala. Ysolde não vê a cena: se ela reconhecer os brinquedos, o segredo acaba cedo.
-2. **O cultista que fugiu.** Na estrada, ele cruzou com um homem de manto correndo, sujo de lama e seiva vermelha, e seguiu o rastro. É ele quem leva o grupo até Tobias, o que também explica por que Tobias está preparado: o cultista chegou antes.
-3. **Mira.** Desacordada, ela aperta o brinquedo de madeira na mão. Só ele sabe quem o fez.
-4. **Em particular, antes da sessão:** mande ao Maurício o que o personagem sabe (as caixas, o homem de cinza, a febre, as manchas, o mapa e o apito) e nada sobre a Peste Cinza nem sobre a Ordem.
-
-- **Na Missão 7:** quando a verdade do Relicário aparece, ele é quem mais sente o golpe duas vezes. O mapa estava certo, mas a leitura estava errada, e o homem de cinza o usou de novo.
-- **Pagamento:** o diário de Tobias fala do "homem de cinza". Deixe o patrulheiro ler essa página primeiro.
+1. **Na sombra da casa de Ysolde.** Anoitecendo, o grupo chega com Mira desacordada. Um vulto de olhos claros está na sombra, vigiando a casa, como faz todas as noites. Quando é visto, não foge. O Maurício decide quanto conta.
+2. **O cultista que fugiu.** Ele viu um homem de manto correndo pela estrada, sujo de lama e seiva vermelha, e seguiu o rastro: é ele quem leva o grupo até Tobias. Isso também explica por que Tobias está preparado: o cultista chegou antes.
+3. **Mira.** Quando ele vê a menina desacordada, a culpa aparece sem você precisar dizer nada. Ysolde não sabe quem matou o marido.
 
 ### Os versos e os Dons chegam com a escolha
 
